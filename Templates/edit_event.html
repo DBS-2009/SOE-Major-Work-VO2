@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h2 class="page-title">Edit Event</h2>
+</div>
+<form method="post" style="max-width: 600px; margin: 2rem auto; background: #232f3a; padding: 2rem; border-radius: 8px;">
+  <div style="margin-bottom: 1rem;">
+    <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Event Title</label>
+    <input type="text" name="title" value="{{ event.title }}" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+  </div>
+  <div style="margin-bottom: 1rem;">
+    <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Location</label>
+    <input type="text" name="location" value="{{ event.location }}" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+  </div>
+  <div style="margin-bottom: 1rem; display: flex; gap: 1rem;">
+    <div style="flex: 1;">
+      <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Start Time</label>
+      <input type="datetime-local" name="start_time" value="{{ event.start_time.strftime('%Y-%m-%dT%H:%M') if event.start_time else '' }}" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+    </div>
+    <div style="flex: 1;">
+      <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">End Time</label>
+      <input type="datetime-local" name="end_time" value="{{ event.end_time.strftime('%Y-%m-%dT%H:%M') if event.end_time else '' }}" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+    </div>
+  </div>
+  <div style="margin-bottom: 1rem; display: flex; gap: 1rem;">
+    <div style="flex: 1;">
+      <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Setup Minutes</label>
+      <input type="number" name="setup_minutes" value="{{ event.setup_minutes or '' }}" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+    </div>
+    <div style="flex: 1;">
+      <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Packup Minutes</label>
+      <input type="number" name="packup_minutes" value="{{ event.packup_minutes or '' }}" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+    </div>
+  </div>
+  <div style="margin-bottom: 1rem;">
+    <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Assign Employees</label>
+    <select name="employee_ids" multiple style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+      {% for emp in employees %}
+      <option value="{{ emp.id }}" {% if emp in event.employees %}selected{% endif %}>{{ emp.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div style="margin-bottom: 1rem;">
+    <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Assign Resources</label>
+    <div style="background: #1a252f; border: 1px solid #2d3f4d; border-radius: 4px; padding: 1rem; max-height: 240px; overflow-y: auto;">
+      {% for res in resources %}
+      <label style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.6rem; cursor:pointer;">
+        <input type="checkbox" name="resource_ids" value="{{ res.id }}" {% if res in event.resources %}checked{% endif %} style="cursor:pointer;">
+        <span style="color:#e0e0e0;">{{ res.item_code }}{% if res.description %} — {{ res.description }}{% endif %}</span>
+      </label>
+      {% endfor %}
+    </div>
+  </div>
+  <div style="display: flex; gap: 1rem; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid #2d3f4d;">
+    <a href="{{ url_for('events') }}" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+  </div>
+</form>
+{% endblock %}

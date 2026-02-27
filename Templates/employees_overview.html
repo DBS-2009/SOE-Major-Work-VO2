@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="display: flex; align-items: center; margin-bottom: 1.5rem; gap: 1rem;">
+  <a href="{{ url_for('rosters') }}" style="color: #ff9191; text-decoration: none; font-size: 1.1rem;">←</a>
+  <h2 class="page-title" style="margin: 0;">Employee Overview</h2>
+</div>
+
+<h3 style="color: #ff9191; margin-bottom: 1.5rem;">Employees Overview Top</h3>
+
+<!-- Filter Section -->
+<div class="filter-section" style="margin-bottom: 1.5rem;">
+  <div class="filter-row">
+    <div class="filter-group" style="flex: 2;">
+      <label>Search</label>
+      <input type="text" id="searchInput" placeholder="Search employees...">
+    </div>
+    <div class="filter-actions">
+      <button class="btn btn-primary" onclick="applyFilters()">Go</button>
+      <button class="btn btn-secondary" onclick="resetFilters()">Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- Employees Table -->
+<div class="resources-header" style="margin-bottom: 1rem;">
+  <div class="resources-count">Employees (<span id="employeeCount">{{ employees|length }}</span>)</div>
+  {% if current_user.is_admin %}
+  <button class="btn btn-primary" onclick="openAddEmployeeForm()">+ Add Employee</button>
+  {% endif %}
+</div>
+
+<div class="table-wrapper">
+  <table id="employeesTable">
+    <thead>
+      <tr>
+        <th>Employee ID</th>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Experience (Years)</th>
+        <th>Level of Training</th>
+        <th>Training Status</th>
+        <th>Qualifications</th>
+        <th style="width: 120px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for emp in employees %}
+      <tr class="employee-row" data-search="{{ emp.name }}">
+        <td>{{ emp.id }}</td>
+        <td>
+          <a href="{{ url_for('employee_detail', employee_id=emp.id) }}" style="color: #ffffff; text-decoration: none; font-weight: 500;">{{ emp.name }}</a>
+        </td>
+        <td>{{ emp.age or '-' }}</td>
+        <td>{{ emp.experience_years or '-' }}</td>
+        <td>{{ emp.level_of_training or '-' }}</td>
+        <td>
+          {% if emp.training_status and emp.training_status|lower == 'not trained' %}
+            <span style="background: #ffeded; color: #d32f2f; border: 1px solid #d32f2f; padding: 0.15rem 0.6rem; border-radius: 12px; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center;">
+              Not active
+            </span>
+          {% else %}
+            {{ emp.training_status or 'Not Trained' }}
+          {% endif %}
+        </td>
+        <td>
+          <div style="display:flex; gap:0.35rem; flex-wrap:wrap;">
+            {% for q in emp.qualifications %}
+              <div style="background: rgba(13, 204, 255, 0.08); color:#ffffff; padding:0.2rem 0.4rem; border-radius:3px; font-size:0.75rem;">
+                {{ q.name }}<br><small style="color:#ffffff;">{{ q.attained_date and q.attained_date.strftime('%Y-%m-%d') or '-' }} → {{ q.expires_date and q.expires_date.strftime('%Y-%m-%d') or '-' }}</small>
+              </div>
+            {% else %}
+              <div style="color:#6b7982; font-size:0.85rem;">—</div>
+            {% endfor %}
+          </div>
+        </td>
+        <td style="text-align: center;">
+          <a href="{{ url_for('employee_detail', employee_id=emp.id) }}" style="text-decoration: none;">
+            <button class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">View</button>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Add Employee Modal (Admin Only) -->
+{% if current_user.is_admin %}
+<div id="addEmployeeModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; display: none;">
+  <div style="background: #000000; border: 1px solid #000000; border-radius: 8px; padding: 2rem; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
+    <h3 style="color: #ff9191; margin-bottom: 1.5rem;">Add New Employee</h3>
+    <form method="post" action="{{ url_for('new_employee') }}">
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Name *</label>
+        <input type="text" name="name" required style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Age</label>
+        <input type="number" name="age" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+      </div>
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Qualifications</label>
+          <textarea name="qualifications" rows="3" placeholder="Enter qualifications..." style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;"></textarea>
+        </div>
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Experience (years)</label>
+        <input type="number" name="experience_years" value="0" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Level of Training</label>
+        <input type="text" name="level_of_training" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+      </div>
+      <div style="margin-bottom: 2rem;">
+        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Training Status</label>
+        <input type="text" name="training_status" value="Not Trained" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+      </div>
+      <div style="display: flex; gap: 1rem; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid #2d3f4d;">
+        <button type="button" class="btn btn-secondary" onclick="closeAddEmployeeForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create Employee</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+<script>
+  const allRows = Array.from(document.querySelectorAll('.employee-row'));
+
+  function applyFilters() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    let visibleCount = 0;
+
+    allRows.forEach(row => {
+      const matchesSearch = row.dataset.search.toLowerCase().includes(searchTerm);
+      row.style.display = matchesSearch ? '' : 'none';
+      if (matchesSearch) visibleCount++;
+    });
+
+    document.getElementById('employeeCount').textContent = visibleCount;
+  }
+
+  function resetFilters() {
+    document.getElementById('searchInput').value = '';
+    allRows.forEach(row => row.style.display = '');
+    document.getElementById('employeeCount').textContent = allRows.length;
+  }
+
+  function openAddEmployeeForm() {
+    document.getElementById('addEmployeeModal').style.display = 'flex';
+  }
+
+  function closeAddEmployeeForm() {
+    document.getElementById('addEmployeeModal').style.display = 'none';
+  }
+
+  document.getElementById('searchInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') applyFilters();
+  });
+
+  document.getElementById('addEmployeeModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeAddEmployeeForm();
+    }
+  });
+</script>
+
+{% endblock %}

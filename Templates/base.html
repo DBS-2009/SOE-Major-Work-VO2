@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Rostering & Resource System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+</head>
+
+<body>
+<header>
+  <h1>Rostering & Resource Allocation</h1>
+
+  {% if current_user.is_authenticated %}
+  <nav>
+    <a href="{{ url_for('index') }}">Dashboard</a>
+    <a href="{{ url_for('resources') }}">Resources</a>
+    <a href="{{ url_for('rosters') }}">Rosters</a>
+    {% if current_user.is_admin %}
+      <a href="{{ url_for('employees_overview') }}">Employees</a>
+    {% endif %}
+    {% if current_user.is_admin %}
+      <a href="{{ url_for('events') }}">Events</a>
+    {% endif %}
+
+    {% if current_user.is_admin %}
+      <a href="{{ url_for('users') }}">Users</a>
+    {% endif %}
+
+    <a href="{{ url_for('logout') }}">Logout</a>
+  </nav>
+  {% endif %}
+</header>
+
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('{{ url_for("static", filename="sw.js") }}');
+  }
+</script>
+
+</body>
+</html>

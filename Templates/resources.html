@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h2 class="page-title">Resources</h2>
+</div>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div style="margin-bottom:1rem;">
+      {% for msg in messages %}
+        <div style="background: rgba(0, 0, 0, 0.08); border:1px solid #ffffff; color:#ffffff; padding:0.75rem; border-radius:4px; margin-bottom:0.5rem;">{{ msg }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+<!-- Filter Section -->
+<div class="filter-section">
+  <div class="filter-row">
+    <div class="filter-group" style="flex: 2;">
+      <label>Search</label>
+      <input type="text" id="searchInput" placeholder="Search by item code or description...">
+    </div>
+    <div class="filter-group">
+      <label>Category</label>
+      <select id="categoryFilter">
+        <option value="">All Categories</option>
+      </select>
+    </div>
+    <div class="filter-actions">
+      <button class="btn btn-primary" onclick="applyFilters()">Go</button>
+      <button class="btn btn-secondary" onclick="resetFilters()">Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- Resources Table -->
+<div class="resources-header">
+  <div class="resources-count">Resources (<span id="resourceCount">{{ resources|length }}</span>)</div>
+</div>
+
+<div class="table-wrapper">
+  <table id="resourcesTable">
+    <thead>
+      <tr>
+        <th style="width: 60px;">Image</th>
+        <th>Item Code / Description</th>
+        <th>Category</th>
+        <th>Type</th>
+        <th>Quantity</th>
+        <th>Asset #</th>
+        <th>Condition</th>
+        <th style="width: 120px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for res in resources %}
+      <tr class="resource-row" data-category="{{ res.category }}" data-search="{{ res.item_code }} {{ res.description }}">
+        <td>
+          <div class="resource-img">{{ res.item_code[:3].upper() }}</div>
+        </td>
+        <td>
+          <div style="font-weight: 500;">{{ res.item_code }}</div>
+          <div style="color: #ffffff; font-size: 0.85rem;">{{ res.description or 'N/A' }}</div>
+        </td>
+        <td>{{ res.category }}</td>
+        <td>{{ res.type }}</td>
+        <td>
+          <div style="text-align: center; font-weight: 600;">{{ res.qty }}</div>
+        </td>
+        <td>{{ res.asset_number or '-' }}</td>
+        <td>
+          <span class="status-badge">OK</span>
+        </td>
+        <td style="text-align: center;">
+          <a href="{{ url_for('resource_detail', resource_id=res.id) }}" style="text-decoration: none;">
+            <button class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">View</button>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Add Resource Button (Admin Only) -->
+{% if current_user.is_admin %}
+<div style="margin-top: 1.5rem;">
+  <button class="btn btn-primary" onclick="openAddResourceForm()">+ Add Resource</button>
+</div>
+
+<!-- Add Resource Form (Modal) -->
+<div id="addResourceModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; display: none;">
+  <div style="background: #000000; border: 1px solid #000000; border-radius: 8px; padding: 2rem; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
+    <h3 style="color: #ff9191; margin-bottom: 1.5rem;">Add New Resource</h3>
+    <form method="post" action="{{ url_for('new_resource') }}" id="resourceForm">
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Item Code *</label>
+        <input type="text" name="item_code" required style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Category *</label>
+        <input type="text" name="category" required style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Type *</label>
+        <input type="text" name="type" required style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Description</label>
+        <input type="text" name="description" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Quantity</label>
+        <input type="number" name="qty" value="1" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Asset Number</label>
+        <input type="text" name="asset_number" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Date of Manufacture</label>
+        <input type="date" name="dom" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+      </div>
+      <div style="margin-bottom: 2rem;">
+        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Lifespan (years)</label>
+        <input type="number" name="lifespan_years" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+      </div>
+      <div style="display: flex; gap: 1rem; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid #2d3f4d;">
+        <button type="button" class="btn btn-secondary" onclick="closeAddResourceForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+<script>
+  // Dynamic category collection from table
+  const allRows = Array.from(document.querySelectorAll('.resource-row'));
+  const categories = new Set(allRows.map(row => row.dataset.category).filter(c => c));
+  const categorySelect = document.getElementById('categoryFilter');
+  
+  categories.forEach(cat => {
+    if (!Array.from(categorySelect.options).some(opt => opt.value === cat)) {
+      const option = document.createElement('option');
+      option.value = cat;
+      option.textContent = cat;
+      categorySelect.appendChild(option);
+    }
+  });
+
+  function applyFilters() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const categoryFilter = document.getElementById('categoryFilter').value;
+    let visibleCount = 0;
+
+    allRows.forEach(row => {
+      const matchesSearch = row.dataset.search.toLowerCase().includes(searchTerm);
+      const matchesCategory = !categoryFilter || row.dataset.category === categoryFilter;
+      const isVisible = matchesSearch && matchesCategory;
+      row.style.display = isVisible ? '' : 'none';
+      if (isVisible) visibleCount++;
+    });
+
+    document.getElementById('resourceCount').textContent = visibleCount;
+  }
+
+  function resetFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('categoryFilter').value = '';
+    allRows.forEach(row => row.style.display = '');
+    document.getElementById('resourceCount').textContent = allRows.length;
+  }
+
+  function openAddResourceForm() {
+    document.getElementById('addResourceModal').style.display = 'flex';
+  }
+
+  function closeAddResourceForm() {
+    document.getElementById('addResourceModal').style.display = 'none';
+  }
+
+  // Search on Enter key
+  document.getElementById('searchInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') applyFilters();
+  });
+</script>
+{% endblock %}

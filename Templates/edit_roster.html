@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-header">
+  <h2 class="page-title">Edit Roster Entry</h2>
+</div>
+
+<form method="post" action="">
+  <div style="margin-bottom: 1rem;">
+    <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Date *</label>
+    <input type="date" name="date" value="{{ roster.date|strftime('%Y-%m-%d') }}" required style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+  </div>
+
+  <div style="margin-bottom: 1rem;">
+    <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Shift Name *</label>
+    <input type="text" name="shift_name" value="{{ roster.shift_name }}" required style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+  </div>
+
+  <div style="margin-bottom: 1rem;">
+    <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Employee *</label>
+    <select name="employee_id" required style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+      {% for emp in employees %}
+      <option value="{{ emp.id }}" {% if emp.id == roster.employee_id %}selected{% endif %}>{{ emp.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div style="margin-bottom: 2rem;">
+    <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Job Description</label>
+    <select id="eventJobDescSelect" name="job_description_select" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px; margin-bottom: 0.5rem;">
+      <option value="" {% if not roster.job_description %}selected{% endif %}>Select event for job description</option>
+      {% for event in events %}
+      <option value="{{ event.title }}" {% if event.title == roster.job_description %}selected{% endif %}>{{ event.title }}</option>
+      {% endfor %}
+      <option value="__custom__" {% if roster.job_description and roster.job_description not in [event.title for event in events] %}selected{% endif %}>Other (enter manually)</option>
+    </select>
+    {% set show_custom = roster.job_description and roster.job_description not in [event.title for event in events] %}
+    {% set custom_input_style = 'width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px' + ('; display: none;' if not show_custom else '') %}
+    {% if show_custom %}
+    <input id="customJobDescInput" type="text" name="job_description" placeholder="Enter job description" value="{{ roster.job_description }}"
+      style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+    {% else %}
+    <input id="customJobDescInput" type="text" name="job_description" placeholder="Enter job description" value="" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px; display: none;">
+    {% endif %}
+  </div>
+
+  <div style="display: flex; gap: 1rem; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid #2d3f4d;">
+    <a href="{{ url_for('rosters') }}" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+  </div>
+</form>
+
+<script>
+  // Job description select logic
+  document.addEventListener('DOMContentLoaded', function() {
+    var select = document.getElementById('eventJobDescSelect');
+    var customInput = document.getElementById('customJobDescInput');
+    if (select) {
+      select.addEventListener('change', function() {
+        if (this.value === '__custom__') {
+          customInput.style.display = 'block';
+          customInput.required = true;
+        } else if (this.value) {
+          customInput.style.display = 'none';
+          customInput.required = false;
+          customInput.value = this.value;
+        } else {
+          customInput.style.display = 'none';
+          customInput.required = false;
+          customInput.value = '';
+        }
+      });
+    }
+  });
+</script>
+
+{% endblock %}

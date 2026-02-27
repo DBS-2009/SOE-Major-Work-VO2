@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="margin-bottom: 1.5rem;">
+  <a href="{{ url_for('resources') }}" style="color: #0dccff; text-decoration: none; font-size: 0.9rem;">← Back to Resources</a>
+</div>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div style="margin-bottom:1rem;">
+      {% for msg in messages %}
+        <div style="background: rgba(13,204,255,0.08); border:1px solid #2d3f4d; color:#b0bcc4; padding:0.75rem; border-radius:4px; margin-bottom:0.5rem;">{{ msg }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="page-header">
+  <h2 class="page-title">Resource Details</h2>
+</div>
+
+<div class="table-wrapper" style="padding: 2rem;">
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+    <!-- Left Column -->
+    <div>
+      <div style="margin-bottom: 2rem;">
+        <div class="resource-img" style="width: 120px; height: 120px; font-size: 1.5rem;">{{ resource.item_code[:3].upper() }}</div>
+      </div>
+      
+      <div style="margin-bottom: 1.5rem;">
+        <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Item Code</label>
+        <div style="font-size: 1.1rem; font-weight: 600; color: #e0e0e0; margin-top: 0.5rem;">{{ resource.item_code }}</div>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Description</label>
+        <div style="font-size: 0.95rem; color: #e0e0e0; margin-top: 0.5rem;">{{ resource.description or 'N/A' }}</div>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Status</label>
+        <div style="margin-top: 0.5rem;">
+          <span class="status-badge">OK</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div>
+      <div style="margin-bottom: 1.5rem;">
+        <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Category</label>
+        <div style="font-size: 0.95rem; color: #e0e0e0; margin-top: 0.5rem;">{{ resource.category }}</div>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Type</label>
+        <div style="font-size: 0.95rem; color: #e0e0e0; margin-top: 0.5rem;">{{ resource.type }}</div>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Quantity Available</label>
+        <div style="font-size: 1.3rem; font-weight: 600; color: #0dccff; margin-top: 0.5rem;">{{ resource.qty }}</div>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Asset Number</label>
+        <div style="font-size: 0.95rem; color: #e0e0e0; margin-top: 0.5rem;">{{ resource.asset_number or '-' }}</div>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Date of Manufacture</label>
+        <div style="font-size: 0.95rem; color: #e0e0e0; margin-top: 0.5rem;">{{ resource.dom or '-' }}</div>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Lifespan (years)</label>
+        <div style="font-size: 0.95rem; color: #e0e0e0; margin-top: 0.5rem;">{{ resource.lifespan_years or '-' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  {% if current_user.is_admin %}
+  <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #2d3f4d; display: flex; gap: 1rem;">
+    <a href="{{ url_for('edit_resource', resource_id=resource.id) }}" style="flex:1; text-decoration:none;">
+      <button class="btn btn-secondary" style="width:100%;">Edit Resource</button>
+    </a>
+
+    <form method="post" action="{{ url_for('delete_resource', resource_id=resource.id) }}" style="flex:1; margin:0;">
+      <button type="button" class="btn btn-secondary" style="width:100%; color: #ff6b6b; border-color: #ff6b6b;" onclick="confirmDeleteResource()">Scrap Resource</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+  function confirmDeleteResource(){
+    if(confirm('Delete this resource? This action cannot be undone.')){
+      const form = document.querySelector('form[action^="{{ url_for("delete_resource", resource_id=resource.id) }}"]');
+      if(form) form.submit();
+    }
+  }
+</script>
+
+{% endblock %}
