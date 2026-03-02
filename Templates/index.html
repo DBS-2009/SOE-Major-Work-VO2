@@ -2,138 +2,168 @@
 {% block content %}
 
 <style>
+/* ------------------------------
+   PAGE HEADER
+------------------------------ */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+
+.dashboard-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.welcome-text {
+  font-size: 1rem;
+  color: #b0bcc4;
+}
+
+/* ------------------------------
+   STATS GRID
+------------------------------ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.stat-card {
+  background: #0d0d0d;
+  border: 1px solid #1f1f1f;
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow: 0 0 20px rgba(0,0,0,0.35);
+  transition: 0.2s;
+}
+
+.stat-card:hover {
+  border-color: #ff4d4d;
+  transform: translateY(-3px);
+}
+
+.stat-value {
+  font-size: 2.6rem;
+  font-weight: 700;
+  color: #ff4d4d;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: #b0bcc4;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ------------------------------
+   SECTION HEADERS
+------------------------------ */
+.dashboard-section {
+  margin-bottom: 3rem;
+}
+
+.section-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #1f1f1f;
+}
+
+/* ------------------------------
+   EVENT & RESOURCE CARDS
+------------------------------ */
+.events-list,
+.resources-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.event-card,
+.resource-card {
+  background: #111;
+  border: 1px solid #1f1f1f;
+  border-left: 4px solid #ff2e2e;
+  border-radius: 10px;
+  padding: 1.25rem;
+  transition: 0.2s;
+  box-shadow: 0 0 15px rgba(0,0,0,0.25);
+}
+
+.event-card:hover,
+.resource-card:hover {
+  background: #1a1a1a;
+  border-left-color: #ff4d4d;
+}
+
+.event-title,
+.resource-title {
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.4rem;
+  font-size: 1.05rem;
+}
+
+.event-details,
+.resource-details {
+  font-size: 0.9rem;
+  color: #b0bcc4;
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.event-time,
+.event-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* ------------------------------
+   EMPTY STATE
+------------------------------ */
+.empty-state {
+  background: #0d0d0d;
+  border: 1px solid #1f1f1f;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  color: #b0bcc4;
+  font-size: 1rem;
+  box-shadow: 0 0 20px rgba(0,0,0,0.35);
+}
+
+.empty-state a {
+  color: #ff4d4d;
+  text-decoration: none;
+}
+
+.empty-state a:hover {
+  text-decoration: underline;
+}
+
+/* ------------------------------
+   RESPONSIVE
+------------------------------ */
+@media (max-width: 768px) {
   .dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-  }
-
-  .dashboard-title {
-    font-size: 2rem;
-    font-weight: 500;
-    color: #0dccff;
-  }
-
-  .welcome-text {
-    font-size: 0.95rem;
-    color: #b0bcc4;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
   }
 
   .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   }
-
-  .stat-card {
-    background: #232f3a;
-    border: 1px solid #2d3f4d;
-    border-radius: 4px;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .stat-value {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #0dccff;
-  }
-
-  .stat-label {
-    font-size: 0.85rem;
-    color: #b0bcc4;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .dashboard-section {
-    margin-bottom: 2.5rem;
-  }
-
-  .section-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #e0e0e0;
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid #2d3f4d;
-  }
-
-  .events-list,
-  .resources-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .event-card,
-  .resource-card {
-    background: #232f3a;
-    border-left: 3px solid #0dccff;
-    border-radius: 4px;
-    padding: 1rem;
-    transition: all 0.2s;
-  }
-
-  .event-card:hover,
-  .resource-card:hover {
-    background: #2a3849;
-    border-left-color: #0ab8db;
-  }
-
-  .event-title,
-  .resource-title {
-    font-weight: 600;
-    color: #e0e0e0;
-    margin-bottom: 0.25rem;
-  }
-
-  .event-details,
-  .resource-details {
-    font-size: 0.85rem;
-    color: #b0bcc4;
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .event-time {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-  }
-
-  .event-location {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-  }
-
-  .empty-state {
-    background: #232f3a;
-    border: 1px solid #2d3f4d;
-    border-radius: 4px;
-    padding: 2rem;
-    text-align: center;
-    color: #b0bcc4;
-  }
-
-  @media (max-width: 768px) {
-    .stats-grid {
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1rem;
-    }
-
-    .dashboard-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 1rem;
-    }
-  }
+}
 </style>
 
 <div class="dashboard-header">
@@ -149,10 +179,12 @@
     <div class="stat-value">{{ events|length }}</div>
     <div class="stat-label">Total Events</div>
   </div>
+
   <div class="stat-card">
     <div class="stat-value">{{ resources|length }}</div>
     <div class="stat-label">Resources</div>
   </div>
+
   <div class="stat-card">
     <div class="stat-value">{{ employees|length }}</div>
     <div class="stat-label">Team Members</div>
@@ -162,6 +194,7 @@
 <!-- Upcoming Events Section -->
 <div class="dashboard-section">
   <h3 class="section-title">Upcoming Events</h3>
+
   {% if events %}
     <div class="events-list">
       {% for e in events[:5] %}
@@ -176,7 +209,7 @@
     </div>
   {% else %}
     <div class="empty-state">
-      <p>No events scheduled. <a href="{{ url_for('events') }}" style="color: #0dccff;">Create</a></p>
+      No events scheduled. <a href="{{ url_for('events') }}">Create one</a>
     </div>
   {% endif %}
 </div>
@@ -184,6 +217,7 @@
 <!-- Resources Section -->
 <div class="dashboard-section">
   <h3 class="section-title">Resources Overview</h3>
+
   {% if resources %}
     <div class="resources-list">
       {% for r in resources[:5] %}
@@ -199,7 +233,7 @@
     </div>
   {% else %}
     <div class="empty-state">
-      <p>No resources added yet. <a href="{{ url_for('resources') }}" style="color: #0dccff;">Add one</a></p>
+      No resources added yet. <a href="{{ url_for('resources') }}">Add one</a>
     </div>
   {% endif %}
 </div>

@@ -21,6 +21,10 @@ header h1 {
   display: none;
 }
 
+.page-header .page-title{
+  color: #ff9191;
+}
+
 nav {
   display: flex;
   align-items: center;

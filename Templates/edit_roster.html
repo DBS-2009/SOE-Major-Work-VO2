@@ -8,7 +8,12 @@
 <form method="post" action="">
   <div style="margin-bottom: 1rem;">
     <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Date *</label>
-    <input type="date" name="date" value="{{ roster.date|strftime('%Y-%m-%d') }}" required style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+
+    <!-- FIXED: Removed strftime filter and replaced with pure Jinja formatting -->
+    <input type="date" name="date"
+      value="{{ roster.date.year }}-{{ '%02d'|format(roster.date.month) }}-{{ '%02d'|format(roster.date.day) }}"
+      required
+      style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
   </div>
 
   <div style="margin-bottom: 1rem;">
@@ -32,15 +37,17 @@
       {% for event in events %}
       <option value="{{ event.title }}" {% if event.title == roster.job_description %}selected{% endif %}>{{ event.title }}</option>
       {% endfor %}
-      <option value="__custom__" {% if roster.job_description and roster.job_description not in [event.title for event in events] %}selected{% endif %}>Other (enter manually)</option>
+      <option value="__custom__" {% if roster.job_description and roster.job_description not in events|map(attribute='title')|list %}selected{% endif %}>Other (enter manually)</option>
     </select>
-    {% set show_custom = roster.job_description and roster.job_description not in [event.title for event in events] %}
-    {% set custom_input_style = 'width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px' + ('; display: none;' if not show_custom else '') %}
+
+    {% set show_custom = roster.job_description and roster.job_description not in events|map(attribute='title')|list %}
+
     {% if show_custom %}
     <input id="customJobDescInput" type="text" name="job_description" placeholder="Enter job description" value="{{ roster.job_description }}"
       style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
     {% else %}
-    <input id="customJobDescInput" type="text" name="job_description" placeholder="Enter job description" value="" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px; display: none;">
+    <input id="customJobDescInput" type="text" name="job_description" placeholder="Enter job description" value=""
+      style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px; display: none;">
     {% endif %}
   </div>
 
@@ -51,7 +58,6 @@
 </form>
 
 <script>
-  // Job description select logic
   document.addEventListener('DOMContentLoaded', function() {
     var select = document.getElementById('eventJobDescSelect');
     var customInput = document.getElementById('customJobDescInput');

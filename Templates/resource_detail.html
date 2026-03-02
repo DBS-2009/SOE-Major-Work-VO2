@@ -1,105 +1,217 @@
 {% extends "base.html" %}
 {% block content %}
 
+<style>
+/* FORCE PAGE TITLE TO DARK RED */
+.page-header .page-title {
+  color: #ff2e2e;
+}
+
+/* BACK LINK */
+.back-link {
+  color: #ff2e2e;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: 0.2s;
+}
+.back-link:hover {
+  color: #ff4d4d;
+}
+
+/* FLASH MESSAGE */
+.detail-flash {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: #ff4d4d;
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+/* WRAPPER */
+.detail-wrapper {
+  background: #111;
+  border: 1px solid #1f1f1f;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-top: 1rem;
+}
+
+/* GRID */
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+}
+
+/* LABEL + VALUE */
+.detail-block {
+  margin-bottom: 1.5rem;
+}
+
+.detail-label {
+  color: #b0bcc4;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-value {
+  margin-top: 0.45rem;
+  font-size: 1rem;
+  color: #e6e6e6;
+}
+
+.detail-value-large {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #ff2e2e;
+}
+
+/* LARGE RESOURCE ICON */
+.detail-icon {
+  width: 120px;
+  height: 120px;
+  border-radius: 10px;
+  background: #1f1f1f;
+  border: 1px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff2e2e;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+}
+
+/* STATUS BADGE */
+.status-badge {
+  background: rgba(255, 46, 46, 0.08);
+  border: 1px solid #ff2e2e;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  color: #ff4d4d;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* ACTION BUTTONS */
+.detail-actions {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #2d3f4d;
+  display: flex;
+  gap: 1rem;
+}
+
+.detail-actions .btn {
+  width: 100%;
+}
+</style>
+
+<!-- BACK LINK -->
 <div style="margin-bottom: 1.5rem;">
-  <a href="{{ url_for('resources') }}" style="color: #0dccff; text-decoration: none; font-size: 0.9rem;">← Back to Resources</a>
+  <a href="{{ url_for('resources') }}" class="back-link">← Back to Resources</a>
 </div>
 
+<!-- FLASH MESSAGES -->
 {% with messages = get_flashed_messages() %}
   {% if messages %}
-    <div style="margin-bottom:1rem;">
-      {% for msg in messages %}
-        <div style="background: rgba(13,204,255,0.08); border:1px solid #2d3f4d; color:#b0bcc4; padding:0.75rem; border-radius:4px; margin-bottom:0.5rem;">{{ msg }}</div>
-      {% endfor %}
-    </div>
+    {% for msg in messages %}
+      <div class="detail-flash">{{ msg }}</div>
+    {% endfor %}
   {% endif %}
 {% endwith %}
 
+<!-- PAGE HEADER -->
 <div class="page-header">
   <h2 class="page-title">Resource Details</h2>
 </div>
 
-<div class="table-wrapper" style="padding: 2rem;">
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-    <!-- Left Column -->
+<!-- DETAILS WRAPPER -->
+<div class="detail-wrapper">
+
+  <div class="detail-grid">
+
+    <!-- LEFT COLUMN -->
     <div>
-      <div style="margin-bottom: 2rem;">
-        <div class="resource-img" style="width: 120px; height: 120px; font-size: 1.5rem;">{{ resource.item_code[:3].upper() }}</div>
-      </div>
-      
-      <div style="margin-bottom: 1.5rem;">
-        <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Item Code</label>
-        <div style="font-size: 1.1rem; font-weight: 600; color: #e0e0e0; margin-top: 0.5rem;">{{ resource.item_code }}</div>
+      <div class="detail-icon">{{ resource.item_code[:3].upper() }}</div>
+
+      <div class="detail-block">
+        <div class="detail-label">Item Code</div>
+        <div class="detail-value">{{ resource.item_code }}</div>
       </div>
 
-      <div style="margin-bottom: 1.5rem;">
-        <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Description</label>
-        <div style="font-size: 0.95rem; color: #e0e0e0; margin-top: 0.5rem;">{{ resource.description or 'N/A' }}</div>
+      <div class="detail-block">
+        <div class="detail-label">Description</div>
+        <div class="detail-value">{{ resource.description or 'N/A' }}</div>
       </div>
 
-      <div style="margin-bottom: 1.5rem;">
-        <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Status</label>
+      <div class="detail-block">
+        <div class="detail-label">Status</div>
         <div style="margin-top: 0.5rem;">
           <span class="status-badge">OK</span>
         </div>
       </div>
     </div>
 
-    <!-- Right Column -->
+    <!-- RIGHT COLUMN -->
     <div>
-      <div style="margin-bottom: 1.5rem;">
-        <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Category</label>
-        <div style="font-size: 0.95rem; color: #e0e0e0; margin-top: 0.5rem;">{{ resource.category }}</div>
+      <div class="detail-block">
+        <div class="detail-label">Category</div>
+        <div class="detail-value">{{ resource.category }}</div>
       </div>
 
-      <div style="margin-bottom: 1.5rem;">
-        <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Type</label>
-        <div style="font-size: 0.95rem; color: #e0e0e0; margin-top: 0.5rem;">{{ resource.type }}</div>
+      <div class="detail-block">
+        <div class="detail-label">Type</div>
+        <div class="detail-value">{{ resource.type }}</div>
       </div>
 
-      <div style="margin-bottom: 1.5rem;">
-        <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Quantity Available</label>
-        <div style="font-size: 1.3rem; font-weight: 600; color: #0dccff; margin-top: 0.5rem;">{{ resource.qty }}</div>
+      <div class="detail-block">
+        <div class="detail-label">Quantity Available</div>
+        <div class="detail-value-large">{{ resource.qty }}</div>
       </div>
 
-      <div style="margin-bottom: 1.5rem;">
-        <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Asset Number</label>
-        <div style="font-size: 0.95rem; color: #e0e0e0; margin-top: 0.5rem;">{{ resource.asset_number or '-' }}</div>
+      <div class="detail-block">
+        <div class="detail-label">Asset Number</div>
+        <div class="detail-value">{{ resource.asset_number or '-' }}</div>
       </div>
 
-      <div style="margin-bottom: 1.5rem;">
-        <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Date of Manufacture</label>
-        <div style="font-size: 0.95rem; color: #e0e0e0; margin-top: 0.5rem;">{{ resource.dom or '-' }}</div>
+      <div class="detail-block">
+        <div class="detail-label">Date of Manufacture</div>
+        <div class="detail-value">{{ resource.dom or '-' }}</div>
       </div>
 
-      <div style="margin-bottom: 1.5rem;">
-        <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Lifespan (years)</label>
-        <div style="font-size: 0.95rem; color: #e0e0e0; margin-top: 0.5rem;">{{ resource.lifespan_years or '-' }}</div>
+      <div class="detail-block">
+        <div class="detail-label">Lifespan (years)</div>
+        <div class="detail-value">{{ resource.lifespan_years or '-' }}</div>
       </div>
     </div>
+
   </div>
 
-  <!-- Action Buttons -->
+  <!-- ACTION BUTTONS -->
   {% if current_user.is_admin %}
-  <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #2d3f4d; display: flex; gap: 1rem;">
-    <a href="{{ url_for('edit_resource', resource_id=resource.id) }}" style="flex:1; text-decoration:none;">
-      <button class="btn btn-secondary" style="width:100%;">Edit Resource</button>
+  <div class="detail-actions">
+    <a href="{{ url_for('edit_resource', resource_id=resource.id) }}" style="text-decoration:none;">
+      <button class="btn btn-secondary">Edit Resource</button>
     </a>
 
-    <form method="post" action="{{ url_for('delete_resource', resource_id=resource.id) }}" style="flex:1; margin:0;">
-      <button type="button" class="btn btn-secondary" style="width:100%; color: #ff6b6b; border-color: #ff6b6b;" onclick="confirmDeleteResource()">Scrap Resource</button>
+    <form method="post" action="{{ url_for('delete_resource', resource_id=resource.id) }}" style="margin:0;">
+      <button type="button" class="btn btn-primary" onclick="confirmDeleteResource()">Scrap Resource</button>
     </form>
   </div>
   {% endif %}
+
 </div>
 
 <script>
-  function confirmDeleteResource(){
-    if(confirm('Delete this resource? This action cannot be undone.')){
-      const form = document.querySelector('form[action^="{{ url_for("delete_resource", resource_id=resource.id) }}"]');
-      if(form) form.submit();
-    }
+function confirmDeleteResource() {
+  if (confirm('Delete this resource? This action cannot be undone.')) {
+    const form = document.querySelector('form[action^="{{ url_for("delete_resource", resource_id=resource.id) }}"]');
+    if (form) form.submit();
   }
+}
 </script>
 
 {% endblock %}

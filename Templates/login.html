@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <title>Login - Rostering & Resource System</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
   <style>
     * {
       margin: 0;
@@ -26,6 +26,7 @@
       min-height: 100vh;
     }
 
+    /* LEFT SIDE – LOGO + GRADIENT */
     .auth-left {
       flex: 1;
       background: linear-gradient(135deg, #ffffff 0%, #000000 100%);
@@ -66,7 +67,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.05px;
+      gap: 0.25rem;
     }
 
     .logo-container {
@@ -78,12 +79,11 @@
     }
 
     .logo-image {
-      max-width: 220px;
+      max-width: 220px;   /* SAME SIZE AS BEFORE */
       width: 100%;
       height: auto;
       object-fit: contain;
       filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
-      padding-bottom: 0px;
     }
 
     .logo-text {
@@ -92,9 +92,9 @@
       font-weight: 500;
       max-width: 250px;
       line-height: 1.6;
-      padding-top: 0px;
     }
 
+    /* RIGHT SIDE – FORM */
     .auth-right {
       flex: 1;
       background: #000000;
@@ -117,7 +117,7 @@
 
     .auth-form-header h2 {
       font-size: 2rem;
-      color: #e0e0e0;
+      color: #ff2e2e;
       margin-bottom: 0.5rem;
     }
 
@@ -143,8 +143,8 @@
     .form-group input {
       width: 100%;
       padding: 0.85rem;
-      background: #232f3a;
-      border: 1px solid #2d3f4d;
+      background: #111111;
+      border: 1px solid #333333;
       color: #e0e0e0;
       border-radius: 6px;
       font-size: 0.95rem;
@@ -153,19 +153,19 @@
 
     .form-group input:focus {
       outline: none;
-      border-color: #eb5353;
-      box-shadow: 0 0 0 3px rgb(255, 138, 138);
+      border-color: #ff2e2e;
+      box-shadow: 0 0 0 3px rgba(255, 46, 46, 0.3);
       background: #000000;
     }
 
     .form-group input::placeholder {
-      color: #ffffff;
+      color: #888888;
     }
 
     .error-message {
-      background: rgba(255, 107, 107, 0.1);
-      border: 1px solid #ff6b6b;
-      color: #ff9999;
+      background: rgba(255, 46, 46, 0.15);
+      border: 1px solid #ff2e2e;
+      color: #ff9f9f;
       padding: 1rem;
       border-radius: 6px;
       margin-bottom: 1.5rem;
@@ -175,7 +175,7 @@
     .btn-login {
       width: 100%;
       padding: 0.9rem;
-      background: #000000;
+      background: #ff2e2e;
       color: #ffffff;
       border: none;
       border-radius: 6px;
@@ -187,9 +187,9 @@
     }
 
     .btn-login:hover {
-      background: #ff2121;
+      background: #ff4d4d;
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgb(255, 120, 120);
+      box-shadow: 0 8px 20px rgba(255, 46, 46, 0.4);
     }
 
     .auth-footer {
@@ -219,7 +219,7 @@
     }
 
     .btn-secondary-auth:hover {
-      background: rgb(255, 92, 92);
+      background: #ff5c5c;
     }
 
     @media (max-width: 768px) {

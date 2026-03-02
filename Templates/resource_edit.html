@@ -1,55 +1,195 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div style="margin-bottom: 1.5rem;">
-  <a href="{{ url_for('resource_detail', resource_id=resource.id) }}" style="color: #0dccff; text-decoration: none; font-size: 0.9rem;">← Back</a>
-</div>
+<style>
+/* ------------------------------
+   GLOBAL PAGE STYLING
+------------------------------ */
+.edit-resource-wrapper {
+  max-width: 700px;
+  margin: 2.5rem auto;
+  background: #0d0d0d;
+  border: 1px solid #1f1f1f;
+  padding: 2rem 2.2rem;
+  border-radius: 12px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.4);
+}
 
-<div class="page-header">
+.page-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* ------------------------------
+   BACK LINK
+------------------------------ */
+.back-link {
+  color: #ff4d4d;
+  text-decoration: none;
+  font-size: 0.9rem;
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  transition: 0.2s;
+}
+
+.back-link:hover {
+  color: #ff7a7a;
+}
+
+/* ------------------------------
+   FLASH MESSAGES
+------------------------------ */
+.flash-box {
+  background: rgba(255, 77, 77, 0.08);
+  border: 1px solid #2a2a2a;
+  color: #d0d0d0;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 0.6rem;
+  font-size: 0.9rem;
+}
+
+/* ------------------------------
+   FORM ELEMENTS
+------------------------------ */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-label {
+  display: block;
+  color: #b0bcc4;
+  font-size: 0.85rem;
+  margin-bottom: 0.45rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  background: #111;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  color: #f5f5f5;
+  font-size: 0.95rem;
+  transition: 0.2s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #ff3b3b;
+  box-shadow: 0 0 0 2px rgba(255, 59, 59, 0.35);
+}
+
+/* ------------------------------
+   BUTTONS
+------------------------------ */
+.btn-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #1f1f1f;
+  margin-top: 1.5rem;
+}
+
+.btn-primary {
+  background: #ff2e2e;
+  border: 1px solid #ff2e2e;
+  padding: 0.65rem 1.2rem;
+  border-radius: 6px;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  background: #ff4d4d;
+  box-shadow: 0 0 12px rgba(255, 46, 46, 0.4);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid #444;
+  padding: 0.65rem 1.2rem;
+  border-radius: 6px;
+  color: #ccc;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-secondary:hover {
+  border-color: #ff9191;
+  color: #ff9191;
+}
+</style>
+
+<a href="{{ url_for('resource_detail', resource_id=resource.id) }}" class="back-link">← Back</a>
+
+<div class="edit-resource-wrapper">
   <h2 class="page-title">Edit Resource</h2>
-</div>
 
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <div style="margin-bottom:1rem;">
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
       {% for msg in messages %}
-        <div style="background: rgba(13,204,255,0.08); border:1px solid #2d3f4d; color:#b0bcc4; padding:0.75rem; border-radius:4px; margin-bottom:0.5rem;">{{ msg }}</div>
+        <div class="flash-box">{{ msg }}</div>
       {% endfor %}
-    </div>
-  {% endif %}
-{% endwith %}
-<div class="table-wrapper" style="padding: 2rem; max-width:720px;">
+    {% endif %}
+  {% endwith %}
+
   <form method="post" action="{{ url_for('edit_resource', resource_id=resource.id) }}">
-    <div style="display:grid; gap:1rem;">
-      <label style="color:#b0bcc4;">Item Code *</label>
-      <input type="text" name="item_code" value="{{ resource.item_code }}" required style="padding:0.65rem; background:#1a252f; border:1px solid #2d3f4d; color:#e0e0e0; border-radius:4px;" />
 
-      <label style="color:#b0bcc4;">Category *</label>
-      <input type="text" name="category" value="{{ resource.category }}" required style="padding:0.65rem; background:#1a252f; border:1px solid #2d3f4d; color:#e0e0e0; border-radius:4px;" />
-
-      <label style="color:#b0bcc4;">Type *</label>
-      <input type="text" name="type" value="{{ resource.type }}" required style="padding:0.65rem; background:#1a252f; border:1px solid #2d3f4d; color:#e0e0e0; border-radius:4px;" />
-
-      <label style="color:#b0bcc4;">Description</label>
-      <input type="text" name="description" value="{{ resource.description }}" style="padding:0.65rem; background:#1a252f; border:1px solid #2d3f4d; color:#e0e0e0; border-radius:4px;" />
-
-      <label style="color:#b0bcc4;">Quantity</label>
-      <input type="number" name="qty" value="{{ resource.qty }}" style="padding:0.65rem; background:#1a252f; border:1px solid #2d3f4d; color:#e0e0e0; border-radius:4px;" />
-
-      <label style="color:#b0bcc4;">Asset Number</label>
-      <input type="text" name="asset_number" value="{{ resource.asset_number }}" style="padding:0.65rem; background:#1a252f; border:1px solid #2d3f4d; color:#e0e0e0; border-radius:4px;" />
-
-      <label style="color:#b0bcc4;">Date of Manufacture</label>
-      <input type="date" name="dom" value="{{ resource.dom }}" style="padding:0.65rem; background:#1a252f; border:1px solid #2d3f4d; color:#e0e0e0; border-radius:4px;" />
-
-      <label style="color:#b0bcc4;">Lifespan (years)</label>
-      <input type="number" name="lifespan_years" value="{{ resource.lifespan_years }}" style="padding:0.65rem; background:#1a252f; border:1px solid #2d3f4d; color:#e0e0e0; border-radius:4px;" />
-
-      <div style="display:flex; gap:1rem; justify-content:flex-end; padding-top:1rem;">
-        <a href="{{ url_for('resource_detail', resource_id=resource.id) }}" class="btn btn-secondary">Cancel</a>
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-      </div>
+    <div class="form-group">
+      <label class="form-label">Item Code *</label>
+      <input type="text" name="item_code" value="{{ resource.item_code }}" required class="form-input">
     </div>
+
+    <div class="form-group">
+      <label class="form-label">Category *</label>
+      <input type="text" name="category" value="{{ resource.category }}" required class="form-input">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Type *</label>
+      <input type="text" name="type" value="{{ resource.type }}" required class="form-input">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <input type="text" name="description" value="{{ resource.description }}" class="form-input">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Quantity</label>
+      <input type="number" name="qty" value="{{ resource.qty }}" class="form-input">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Asset Number</label>
+      <input type="text" name="asset_number" value="{{ resource.asset_number }}" class="form-input">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Date of Manufacture</label>
+      <input type="date" name="dom" value="{{ resource.dom }}" class="form-input">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Lifespan (years)</label>
+      <input type="number" name="lifespan_years" value="{{ resource.lifespan_years }}" class="form-input">
+    </div>
+
+    <div class="btn-row">
+      <a href="{{ url_for('resource_detail', resource_id=resource.id) }}" class="btn-secondary">Cancel</a>
+      <button type="submit" class="btn-primary">Save Changes</button>
+    </div>
+
   </form>
 </div>
 

@@ -1,99 +1,252 @@
 {% extends "base.html" %}
 {% block content %}
 
+<style>
+/* ===========================
+   GLOBAL THEME
+   =========================== */
+body {
+  background: #0d0d0d;
+  color: #e6e6e6;
+  font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+.page-title {
+  color: #ff2e2e !important;
+  font-weight: 700;
+}
+
+/* ===========================
+   BUTTONS
+   =========================== */
+.btn {
+  border-radius: 6px !important;
+  padding: 0.55rem 1rem !important;
+  font-weight: 600 !important;
+  transition: 0.2s ease;
+}
+
+.btn-primary {
+  background: #ff2e2e !important;
+  border: none !important;
+  color: #fff !important;
+}
+
+.btn-primary:hover {
+  background: #ff4d4d !important;
+}
+
+.btn-secondary {
+  background: #1a1a1a !important;
+  border: 1px solid #333 !important;
+  color: #e6e6e6 !important;
+}
+
+.btn-secondary:hover {
+  background: #262626 !important;
+}
+
+/* ===========================
+   TABLE WRAPPER
+   =========================== */
+.table-wrapper {
+  background: #111;
+  border-radius: 10px;
+  border: 1px solid #1f1f1f;
+  padding: 2rem !important;
+}
+
+/* ===========================
+   PROFILE CIRCLE
+   =========================== */
+.profile-circle {
+  background: rgba(255, 46, 46, 0.15);
+  border: 1px solid rgba(255, 46, 46, 0.35);
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-circle span {
+  font-size: 2.5rem;
+  color: #ff2e2e;
+  font-weight: 700;
+}
+
+/* ===========================
+   INFO CARDS
+   =========================== */
+.info-card {
+  background: #161616;
+  border: 1px solid #262626;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.info-card label {
+  color: #b0b0b0;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.info-card .value {
+  color: #ff4d4d;
+  font-size: 1rem;
+  margin-top: 0.4rem;
+}
+
+/* ===========================
+   BADGES
+   =========================== */
+.badge-red {
+  background: rgba(255, 46, 46, 0.15);
+  color: #ff2e2e;
+  border: 1px solid #ff2e2e;
+  padding: 0.25rem 0.7rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.badge-green {
+  background: rgba(0, 255, 100, 0.15);
+  color: #4cff4c;
+  border: 1px solid #4cff4c;
+  padding: 0.25rem 0.7rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+/* ===========================
+   QUALIFICATION TAGS
+   =========================== */
+.qual-tag {
+  background: rgba(255, 46, 46, 0.15);
+  color: #ff4d4d;
+  padding: 0.25rem 0.45rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  border: 1px solid #333;
+  margin-bottom: 0.4rem;
+}
+
+/* ===========================
+   SCROLLBAR
+   =========================== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+</style>
+
 <div style="display: flex; align-items: center; margin-bottom: 1.5rem; gap: 1rem;">
-  <a href="{{ url_for('employees_overview') }}" style="color: #0dccff; text-decoration: none; font-size: 1.1rem;">←</a>
+  <a href="{{ url_for('employees_overview') }}" style="color: #ff2e2e; text-decoration: none; font-size: 1.1rem;">←</a>
   <h2 class="page-title" style="margin: 0;">Employee Details of {{ employee.name }}</h2>
 </div>
 
-<div class="table-wrapper" style="padding: 2rem;">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid #2d3f4d;">
-    <h3 style="color: #e0e0e0; margin: 0;">Employee ID: {{ employee.id }}</h3>
+<div class="table-wrapper">
+
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid #262626;">
+    <h3 style="color: #e6e6e6; margin: 0;">Employee ID: {{ employee.id }}</h3>
     <button class="btn btn-secondary" style="padding: 0.5rem 1rem;">Flip to Resume</button>
   </div>
 
   <div style="display: grid; grid-template-columns: 300px 1fr; gap: 2rem; margin-bottom: 2rem;">
-    
-    <!-- Left Column - Basic Info -->
+
+    <!-- LEFT COLUMN -->
     <div>
-      <div style="background: rgba(13, 204, 255, 0.1); border: 1px solid rgba(13, 204, 255, 0.3); border-radius: 50%; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
-        <div style="font-size: 2.5rem; color: #0dccff; font-weight: 600;">{{ employee.name[:1] }}</div>
+      <div class="profile-circle">
+        <span>{{ employee.name[:1] }}</span>
       </div>
-      
-      <div style="background: #1a252f; border: 1px solid #2d3f4d; border-radius: 4px; padding: 1.5rem;">
+
+      <div class="info-card" style="margin-top: 1.5rem;">
         <div style="margin-bottom: 1.5rem;">
-          <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Name</label>
-          <div style="color: #e0e0e0; font-size: 0.95rem; margin-top: 0.5rem;">{{ employee.name }}</div>
+          <label>Name</label>
+          <div class="value">{{ employee.name }}</div>
         </div>
 
         <div style="margin-bottom: 1.5rem;">
-          <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Age</label>
-          <div style="color: #e0e0e0; font-size: 0.95rem; margin-top: 0.5rem;">{{ employee.age or '-' }}</div>
+          <label>Age</label>
+          <div class="value">{{ employee.age or '-' }}</div>
         </div>
 
         <div style="margin-bottom: 1.5rem;">
-          <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Phone</label>
-          <div style="color: #e0e0e0; font-size: 0.95rem; margin-top: 0.5rem;">-</div>
+          <label>Phone</label>
+          <div class="value">{{ employee.phone or '-' }}</div>
         </div>
       </div>
     </div>
 
-    <!-- Right Column - Detailed Info -->
+    <!-- RIGHT COLUMN -->
     <div>
-      <div style="background: #1a252f; border: 1px solid #2d3f4d; border-radius: 4px; padding: 1.5rem;">
+      <div class="info-card">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-          
+
           <div>
-            <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Experience (Years)</label>
-            <div style="color: #e0e0e0; font-size: 0.95rem; margin-top: 0.5rem;">{{ employee.experience_years or '-' }}</div>
+            <label>Experience (Years)</label>
+            <div class="value">{{ employee.experience_years or '-' }}</div>
           </div>
 
           <div>
-            <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Level of Training</label>
-            <div style="color: #e0e0e0; font-size: 0.95rem; margin-top: 0.5rem;">{{ employee.level_of_training or '-' }}</div>
+            <label>Level of Training</label>
+            <div class="value">{{ employee.level_of_training or '-' }}</div>
           </div>
 
           <div>
-            <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Training Status</label>
-            <div style="color: #e0e0e0; font-size: 0.95rem; margin-top: 0.5rem;">{{ employee.training_status or 'Not Trained' }}</div>
+            <label>Training Status</label>
+            <div class="value">{{ employee.training_status or 'Not Trained' }}</div>
           </div>
+
           <div>
-            <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Status</label>
+            <label>Status</label>
             <div style="margin-top: 0.5rem;">
               {% if employee.training_status and employee.training_status|lower == 'not trained' %}
-                <span class="badge-cross" style="background: #ffeded; color: #d32f2f; border: 1px solid #d32f2f; padding: 0.2rem 0.7rem; border-radius: 12px; font-weight: 600; font-size: 0.95rem; display: inline-flex; align-items: center;">
-                  &times; Not active
-                </span>
+                <span class="badge-red">&times; Not active</span>
               {% else %}
-                <span class="status-badge">Active</span>
+                <span class="badge-green">Active</span>
               {% endif %}
             </div>
           </div>
+
           <div style="grid-column: span 2;">
-            <label style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase;">Qualifications</label>
-            <div style="color: #e0e0e0; font-size: 0.95rem; margin-top: 0.5rem;">
+            <label>Qualifications</label>
+            <div style="margin-top: 0.5rem;">
               {% if employee.qualifications %}
                 {% for q in employee.qualifications %}
-                  <div style="background: rgba(13, 204, 255, 0.08); color:#9de6ff; padding:0.2rem 0.4rem; border-radius:3px; font-size:0.85rem; margin-bottom:0.5rem;">
-                    {{ q.name }}
-                  </div>
+                  <div class="qual-tag">{{ q.name }}</div>
                 {% endfor %}
               {% else %}
-                <span style="color:#6b7982; font-size:0.85rem;">—</span>
+                <span style="color:#666; font-size:0.85rem;">—</span>
               {% endif %}
             </div>
           </div>
+
         </div>
       </div>
     </div>
 
   </div>
 
-  <!-- Action Buttons -->
+  <!-- ACTION BUTTONS -->
   {% if current_user.is_admin %}
-  <div style="display: flex; gap: 1rem; padding-top: 1.5rem; border-top: 1px solid #2d3f4d;">
-    <a href="{{ url_for('edit_employee', employee_id=employee.id) }}" style="flex:1; text-decoration:none;"><button class="btn btn-secondary" style="width:100%;">Edit Employee</button></a>
-    <button type="button" class="btn btn-secondary" style="flex: 1; color: #ff6b6b; border-color: #ff6b6b;" onclick="confirmDelete()">Delete Employee</button>
+  <div style="display: flex; gap: 1rem; padding-top: 1.5rem; border-top: 1px solid #262626;">
+    <a href="{{ url_for('edit_employee', employee_id=employee.id) }}" style="flex:1; text-decoration:none;">
+      <button class="btn btn-secondary" style="width:100%;">Edit Employee</button>
+    </a>
+
+    <button type="button" class="btn btn-primary" style="flex: 1;" onclick="confirmDelete()">Delete Employee</button>
   </div>
 
   <form id="deleteForm" method="post" action="{{ url_for('delete_employee', employee_id=employee.id) }}" style="display: none;"></form>

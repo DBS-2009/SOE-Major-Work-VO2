@@ -1,6 +1,173 @@
 {% extends "base.html" %}
 {% block content %}
 
+<style>
+/* ===========================
+   GLOBAL THEME
+   =========================== */
+body {
+  background: #0d0d0d;
+  color: #e6e6e6;
+  font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+.page-header .page-title {
+  color: #ff2e2e;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* ===========================
+   BUTTONS
+   =========================== */
+.btn {
+  border-radius: 6px !important;
+  padding: 0.55rem 1rem !important;
+  font-weight: 600 !important;
+  transition: 0.2s ease;
+}
+
+.btn-primary {
+  background: #ff2e2e !important;
+  border: none !important;
+  color: #fff !important;
+}
+
+.btn-primary:hover {
+  background: #ff4d4d !important;
+}
+
+.btn-secondary {
+  background: #1a1a1a !important;
+  border: 1px solid #333 !important;
+  color: #e6e6e6 !important;
+}
+
+.btn-secondary:hover {
+  background: #262626 !important;
+}
+
+.btn-danger {
+  background: #b30000 !important;
+  border: none !important;
+}
+
+.btn-danger:hover {
+  background: #cc0000 !important;
+}
+
+/* ===========================
+   MAIN WRAPPER
+   =========================== */
+.table-wrapper {
+  background: #111;
+  border-radius: 10px;
+  border: 1px solid #1f1f1f;
+  padding: 1.5rem !important;
+}
+
+/* ===========================
+   SECTION LABELS
+   =========================== */
+.table-wrapper .section-label,
+div[style*="text-transform: uppercase"] {
+  color: #888 !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.7px !important;
+}
+
+/* ===========================
+   EMPLOYEE SIDEBAR CARDS
+   =========================== */
+.table-wrapper a div {
+  background: #161616 !important;
+  border: 1px solid #262626 !important;
+  border-radius: 8px !important;
+  transition: 0.25s ease !important;
+}
+
+.table-wrapper a div:hover {
+  background: #1f1f1f !important;
+  border-color: #333 !important;
+}
+
+.table-wrapper a div div:first-child {
+  background: #1f1f1f !important;
+  color: #ff2e2e !important;
+  border: 1px solid #333 !important;
+}
+
+/* ===========================
+   ROSTER CARDS
+   =========================== */
+.table-wrapper .roster-card,
+.table-wrapper > div > div > div[style*="border-left"] {
+  background: #161616 !important;
+  border-left: 4px solid #ff2e2e !important;
+  border-radius: 8px !important;
+  padding: 1.25rem !important;
+  transition: 0.25s ease !important;
+}
+
+.table-wrapper .roster-card:hover,
+.table-wrapper > div > div > div[style*="border-left"]:hover {
+  background: #1f1f1f !important;
+}
+
+.table-wrapper .roster-card div,
+.table-wrapper > div > div > div[style*="border-left"] div {
+  color: #d0d0d0 !important;
+}
+
+.table-wrapper span {
+  color: #ff2e2e !important;
+}
+
+/* ===========================
+   MODAL
+   =========================== */
+#addRosterModal > div {
+  background: #161616 !important;
+  border: 1px solid #262626 !important;
+  border-radius: 10px !important;
+}
+
+#addRosterModal h3 {
+  color: #ff2e2e !important;
+  font-weight: 700;
+}
+
+#addRosterModal input,
+#addRosterModal select {
+  background: #0f0f0f !important;
+  border: 1px solid #262626 !important;
+  color: #e6e6e6 !important;
+  border-radius: 6px !important;
+}
+
+#addRosterModal input:focus,
+#addRosterModal select:focus {
+  border-color: #ff2e2e !important;
+  outline: none !important;
+}
+
+/* ===========================
+   SCROLLBAR
+   =========================== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+</style>
+
 <div class="page-header">
   <h2 class="page-title">Rosters</h2>
 </div>
@@ -29,7 +196,7 @@
       {% for emp in employees %}
       <a href="{{ url_for('employee_detail', employee_id=emp.id) }}" style="text-decoration: none;">
         <div style="display: flex; align-items: center; margin-bottom: 1rem; padding: 1rem; background: #232f3a; border: 1px solid #2d3f4d; border-radius: 4px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#2d3f4d'" onmouseout="this.style.background='#232f3a'">
-          <div style="width: 40px; height: 40px; border-radius: 50%; background: #0dccff; display: flex; align-items: center; justify-content: center; color: #0a1929; font-weight: 600; font-size: 0.85rem; margin-right: 0.75rem;">{{ emp.name[:1] }}</div>
+          <div style="width: 40px; height: 40px; border-radius: 50%; background: #303030; display: flex; align-items: center; justify-content: center; color: #ff9191; font-weight: 600; font-size: 0.85rem; margin-right: 0.75rem;">{{ emp.name[:1] }}</div>
           <div>
             <div style="font-weight: 500; color: #e0e0e0; font-size: 0.9rem;">{{ emp.name }}</div>
             <div style="color: #6b7982; font-size: 0.8rem;">{{ emp.level_of_training or 'Staff' }}</div>
@@ -44,12 +211,12 @@
       <div style="color: #b0bcc4; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 1rem; font-weight: 600;">Roster Schedule (<span id="rosterCount">{{ rosters|length }}</span>)</div>
       
       {% for r in rosters %}
-      <div style="background: #232f3a; border-left: 4px solid #0dccff; padding: 1rem; margin-bottom: 1rem; border-radius: 4px; transition: all 0.2s;" onmouseover="this.style.background='#2d3f4d'" onmouseout="this.style.background='#232f3a'">
+      <div style="background: #232f3a; border-left: 4px solid #ff9191; padding: 1rem; margin-bottom: 1rem; border-radius: 4px; transition: all 0.2s;" onmouseover="this.style.background='#2d3f4d'" onmouseout="this.style.background='#232f3a'">
         <div style="display: flex; justify-content: space-between; align-items: start;">
           <div style="flex: 1;">
             <div style="font-weight: 600; color: #e0e0e0; font-size: 0.95rem;">{{ r.employee.name }}</div>
             <div style="color: #b0bcc4; font-size: 0.85rem; margin-top: 0.25rem;">
-              📅 {{ r.date.strftime('%b %d, %Y') }} — <span style="color: #0dccff;">{{ r.shift_name }}</span>
+              📅 {{ r.date.strftime('%b %d, %Y') }} — <span style="color: #ff9191;">{{ r.shift_name }}</span>
             </div>
             {% if r.job_description %}
             <div style="color: #b0bcc4; font-size: 0.85rem; margin-top: 0.5rem;">
@@ -129,7 +296,6 @@
 <script>
   function openAddRosterForm() {
     document.getElementById('addRosterModal').style.display = 'flex';
-    // Reset job description fields
     document.getElementById('eventJobDescSelect').value = '';
     document.getElementById('customJobDescInput').style.display = 'none';
     document.getElementById('customJobDescInput').value = '';
@@ -145,7 +311,6 @@
     }
   });
 
-  // Job description select logic
   document.addEventListener('DOMContentLoaded', function() {
     var select = document.getElementById('eventJobDescSelect');
     var customInput = document.getElementById('customJobDescInput');

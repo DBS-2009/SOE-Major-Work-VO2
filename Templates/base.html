@@ -4,11 +4,103 @@
   <meta charset="utf-8">
   <title>Rostering & Resource System</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+
+  <style>
+    /* ===========================
+       GLOBAL THEME
+       =========================== */
+    body {
+      background: #0d0d0d;
+      color: #e6e6e6;
+      font-family: "Inter", "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ===========================
+       HEADER
+       =========================== */
+    header {
+      background: #111;
+      border-bottom: 1px solid #1f1f1f;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      color: #ff2e2e;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    /* ===========================
+       NAVIGATION
+       =========================== */
+    nav {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      color: #e6e6e6;
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.5rem 0.9rem;
+      border-radius: 6px;
+      transition: 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    nav a:hover {
+      background: #1a1a1a;
+      border-color: #333;
+      color: #ff4d4d;
+    }
+
+    /* Highlight active page (optional if you add logic) */
+    nav a.active {
+      background: #ff2e2e;
+      color: #fff;
+      border-color: #ff2e2e;
+    }
+
+    /* ===========================
+       MAIN CONTENT
+       =========================== */
+    main {
+      padding: 2rem;
+      max-width: 1400px;
+      margin: auto;
+    }
+
+    /* ===========================
+       SCROLLBAR
+       =========================== */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #333;
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #444;
+    }
+  </style>
 </head>
 
 <body>
+
 <header>
   <h1>Rostering & Resource Allocation</h1>
 
@@ -17,14 +109,10 @@
     <a href="{{ url_for('index') }}">Dashboard</a>
     <a href="{{ url_for('resources') }}">Resources</a>
     <a href="{{ url_for('rosters') }}">Rosters</a>
-    {% if current_user.is_admin %}
-      <a href="{{ url_for('employees_overview') }}">Employees</a>
-    {% endif %}
-    {% if current_user.is_admin %}
-      <a href="{{ url_for('events') }}">Events</a>
-    {% endif %}
 
     {% if current_user.is_admin %}
+      <a href="{{ url_for('employees_overview') }}">Employees</a>
+      <a href="{{ url_for('events') }}">Events</a>
       <a href="{{ url_for('users') }}">Users</a>
     {% endif %}
 

@@ -1,5 +1,272 @@
 {% extends "base.html" %}
 {% block content %}
+
+<style>
+/* ===========================
+   GLOBAL THEME
+   =========================== */
+body {
+  background: #0d0d0d;
+  color: #e6e6e6;
+  font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+.page-header .page-title {
+  color: #ff2e2e;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* ===========================
+   FLASH MESSAGES
+   =========================== */
+.flash-message {
+  background: #1a1a1a !important;
+  border: 1px solid #333 !important;
+  color: #ff4d4d !important;
+  padding: 0.75rem !important;
+  border-radius: 6px !important;
+}
+
+/* ===========================
+   FILTER SECTION
+   =========================== */
+.filter-section {
+  background: #111;
+  padding: 1.25rem;
+  border-radius: 10px;
+  border: 1px solid #1f1f1f;
+  margin-bottom: 1.5rem;
+}
+
+.filter-row {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-end;
+}
+
+.filter-group label {
+  color: #b0b0b0;
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
+  display: block;
+}
+
+.filter-group input,
+.filter-group select {
+  width: 100%;
+  padding: 0.65rem;
+  background: #0f0f0f;
+  border: 1px solid #262626;
+  color: #e6e6e6;
+  border-radius: 6px;
+  transition: 0.2s ease;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+  border-color: #ff2e2e;
+  outline: none;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* ===========================
+   BUTTONS
+   =========================== */
+.btn {
+  border-radius: 6px !important;
+  padding: 0.55rem 1rem !important;
+  font-weight: 600 !important;
+  transition: 0.2s ease;
+}
+
+.btn-primary {
+  background: #ff2e2e !important;
+  border: none !important;
+  color: #fff !important;
+}
+
+.btn-primary:hover {
+  background: #ff4d4d !important;
+}
+
+.btn-secondary {
+  background: #1a1a1a !important;
+  border: 1px solid #333 !important;
+  color: #e6e6e6 !important;
+}
+
+.btn-secondary:hover {
+  background: #262626 !important;
+}
+
+/* ===========================
+   TABLE WRAPPER
+   =========================== */
+.table-wrapper {
+  background: #111;
+  border-radius: 10px;
+  border: 1px solid #1f1f1f;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+/* ===========================
+   TABLE
+   =========================== */
+#resourcesTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#resourcesTable thead {
+  background: #161616;
+}
+
+#resourcesTable th {
+  padding: 0.9rem;
+  text-align: left;
+  font-size: 0.85rem;
+  color: #b0b0b0;
+  border-bottom: 1px solid #222;
+}
+
+#resourcesTable tbody tr {
+  transition: 0.2s ease;
+}
+
+#resourcesTable tbody tr:hover {
+  background: #1a1a1a;
+}
+
+#resourcesTable td {
+  padding: 0.9rem;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+/* ===========================
+   RESOURCE IMAGE BADGE
+   =========================== */
+.resource-img {
+  width: 45px;
+  height: 45px;
+  border-radius: 6px;
+  background: #1f1f1f;
+  border: 1px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff2e2e;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+/* ===========================
+   STATUS BADGE
+   =========================== */
+.status-badge {
+  background: #0f0f0f;
+  border: 1px solid #333;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  color: #4cff4c;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* ===========================
+   CLEAN MODAL (NEW)
+   =========================== */
+
+/* Backdrop */
+.resource-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Panel */
+.resource-modal-panel {
+  background: #111;
+  border: 1px solid #262626;
+  border-radius: 10px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Title */
+.resource-modal-title {
+  color: #ff2e2e;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  color: #b0bcc4;
+  margin-bottom: 0.4rem;
+  font-size: 0.85rem;
+}
+
+/* Boxed Inputs */
+.form-input {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  background: #0f0f0f;
+  border: 1px solid #262626;
+  border-radius: 6px;
+  color: #e6e6e6;
+  font-size: 0.9rem;
+  transition: 0.2s;
+}
+
+.form-input:focus {
+  border-color: #ff2e2e;
+  outline: none;
+}
+
+/* Modal Actions */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #2d3f4d;
+}
+
+/* ===========================
+   SCROLLBAR
+   =========================== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+</style>
+
 <div class="page-header">
   <h2 class="page-title">Resources</h2>
 </div>
@@ -8,11 +275,12 @@
   {% if messages %}
     <div style="margin-bottom:1rem;">
       {% for msg in messages %}
-        <div style="background: rgba(0, 0, 0, 0.08); border:1px solid #ffffff; color:#ffffff; padding:0.75rem; border-radius:4px; margin-bottom:0.5rem;">{{ msg }}</div>
+        <div class="flash-message">{{ msg }}</div>
       {% endfor %}
     </div>
   {% endif %}
 {% endwith %}
+
 <!-- Filter Section -->
 <div class="filter-section">
   <div class="filter-row">
@@ -82,60 +350,69 @@
   </table>
 </div>
 
-<!-- Add Resource Button (Admin Only) -->
 {% if current_user.is_admin %}
 <div style="margin-top: 1.5rem;">
   <button class="btn btn-primary" onclick="openAddResourceForm()">+ Add Resource</button>
 </div>
 
-<!-- Add Resource Form (Modal) -->
-<div id="addResourceModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; display: none;">
-  <div style="background: #000000; border: 1px solid #000000; border-radius: 8px; padding: 2rem; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
-    <h3 style="color: #ff9191; margin-bottom: 1.5rem;">Add New Resource</h3>
+<!-- CLEAN ADD RESOURCE MODAL -->
+<div id="addResourceModal" class="resource-modal-backdrop">
+  <div class="resource-modal-panel">
+    <h3 class="resource-modal-title">Add New Resource</h3>
+
     <form method="post" action="{{ url_for('new_resource') }}" id="resourceForm">
-      <div style="margin-bottom: 1rem;">
-        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Item Code *</label>
-        <input type="text" name="item_code" required style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+
+      <div class="form-group">
+        <label>Item Code *</label>
+        <input type="text" name="item_code" required class="form-input">
       </div>
-      <div style="margin-bottom: 1rem;">
-        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Category *</label>
-        <input type="text" name="category" required style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+
+      <div class="form-group">
+        <label>Category *</label>
+        <input type="text" name="category" required class="form-input">
       </div>
-      <div style="margin-bottom: 1rem;">
-        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Type *</label>
-        <input type="text" name="type" required style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+
+      <div class="form-group">
+        <label>Type *</label>
+        <input type="text" name="type" required class="form-input">
       </div>
-      <div style="margin-bottom: 1rem;">
-        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Description</label>
-        <input type="text" name="description" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+
+      <div class="form-group">
+        <label>Description</label>
+        <input type="text" name="description" class="form-input">
       </div>
-      <div style="margin-bottom: 1rem;">
-        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Quantity</label>
-        <input type="number" name="qty" value="1" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+
+      <div class="form-group">
+        <label>Quantity</label>
+        <input type="number" name="qty" value="1" class="form-input">
       </div>
-      <div style="margin-bottom: 1rem;">
-        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Asset Number</label>
-        <input type="text" name="asset_number" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+
+      <div class="form-group">
+        <label>Asset Number</label>
+        <input type="text" name="asset_number" class="form-input">
       </div>
-      <div style="margin-bottom: 1rem;">
-        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Date of Manufacture</label>
-        <input type="date" name="dom" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+
+      <div class="form-group">
+        <label>Date of Manufacture</label>
+        <input type="date" name="dom" class="form-input">
       </div>
-      <div style="margin-bottom: 2rem;">
-        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Lifespan (years)</label>
-        <input type="number" name="lifespan_years" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+
+      <div class="form-group">
+        <label>Lifespan (years)</label>
+        <input type="number" name="lifespan_years" class="form-input">
       </div>
-      <div style="display: flex; gap: 1rem; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid #2d3f4d;">
+
+      <div class="modal-actions">
         <button type="button" class="btn btn-secondary" onclick="closeAddResourceForm()">Cancel</button>
         <button type="submit" class="btn btn-primary">Create</button>
       </div>
+
     </form>
   </div>
 </div>
 {% endif %}
 
 <script>
-  // Dynamic category collection from table
   const allRows = Array.from(document.querySelectorAll('.resource-row'));
   const categories = new Set(allRows.map(row => row.dataset.category).filter(c => c));
   const categorySelect = document.getElementById('categoryFilter');
@@ -180,9 +457,9 @@
     document.getElementById('addResourceModal').style.display = 'none';
   }
 
-  // Search on Enter key
   document.getElementById('searchInput').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') applyFilters();
   });
 </script>
+
 {% endblock %}

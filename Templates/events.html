@@ -8,79 +8,41 @@
 <!-- Top Controls -->
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding: 0 0.5rem;">
   <div style="display: flex; gap: 1rem; align-items: center;">
-    <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">← Today →</button>
-    <span style="color: #b0bcc4; font-size: 0.95rem;">{{ 'Now' }}</span>
+    <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.9rem; background:#111; border:1px solid #444; color:#fff;">← Today →</button>
+    <span style="color: #ccc; font-size: 0.95rem;">{{ 'Now' }}</span>
   </div>
   
-  <div style="display: flex; gap: 0.5rem;">
-    <button class="btn btn-secondary" style="padding: 0.5rem 1rem;">Day</button>
-    <button class="btn btn-secondary" style="padding: 0.5rem 1rem;">Week</button>
-    <button class="btn btn-primary" style="padding: 0.5rem 1rem;">Month</button>
-    <span style="color: #b0bcc4; font-size: 0.9rem; margin-left: 1rem;">Calendar for:
-      <select style="background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; padding: 0.5rem; border-radius: 4px; margin-left: 0.5rem;">
+  <div style="display: flex; gap: 0.5rem; align-items:center;">
+    <button class="btn btn-secondary" style="padding: 0.5rem 1rem; background:#111; border:1px solid #444; color:#fff;">Day</button>
+    <button class="btn btn-secondary" style="padding: 0.5rem 1rem; background:#111; border:1px solid #444; color:#fff;">Week</button>
+    <button class="btn btn-primary" style="padding: 0.5rem 1rem; background:#ff3b3b; border:1px solid #ff3b3b; color:#fff;">Month</button>
+    <span style="color: #ccc; font-size: 0.9rem; margin-left: 1rem;">Calendar for:
+      <select style="background: #111; border: 1px solid #444; color: #fff; padding: 0.5rem; border-radius: 4px; margin-left: 0.5rem;">
         <option>Team</option>
       </select>
     </span>
     {% if current_user.is_admin %}
-    <button id="createPresetBtn" class="btn btn-primary" style="padding: 0.5rem 1rem; margin-left: 0.5rem;">+ Create Preset</button>
-    <!-- Create Preset Modal -->
-    <div id="createPresetModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1050; align-items: center; justify-content: center; display: none;">
-      <div style="background: #232f3a; border: 1px solid #2d3f4d; border-radius: 8px; padding: 2rem; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
-        <h3 style="color: #0dccff; margin-bottom: 1.5rem;">Create Resource Preset</h3>
-        <form id="createPresetForm" method="post" action="/presets/new">
-          <div style="margin-bottom: 1rem;">
-            <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Preset Name</label>
-            <input type="text" name="name" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
-          </div>
-          <div style="margin-bottom: 1rem;">
-            <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Select Resources</label>
-            <div style="background: #1a252f; border: 1px solid #2d3f4d; border-radius: 4px; padding: 1rem; max-height: 200px; overflow-y: auto;">
-              {% for res in resources %}
-              <label style="display: flex; align-items: center; margin-bottom: 0.75rem; cursor: pointer;">
-                <input type="checkbox" name="resource_ids" value="{{ res.id }}" style="margin-right: 0.75rem; cursor: pointer;">
-                <span style="color: #e0e0e0;">{{ res.item_code }} — {{ res.description or 'N/A' }}</span>
-              </label>
-              {% endfor %}
-            </div>
-          </div>
-          <div style="display: flex; gap: 1rem; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid #2d3f4d;">
-            <button type="button" class="btn btn-secondary" onclick="closeCreatePresetModal()">Cancel</button>
-            <button type="submit" class="btn btn-primary">Create Preset</button>
-          </div>
-        </form>
-      </div>
-    </div>
-    <script>
-      function openCreatePresetModal() {
-        document.getElementById('createPresetModal').style.display = 'flex';
-      }
-      function closeCreatePresetModal() {
-        document.getElementById('createPresetModal').style.display = 'none';
-      }
-      document.getElementById('createPresetBtn').addEventListener('click', function() {
-        openCreatePresetModal();
-      });
-      document.getElementById('createPresetModal')?.addEventListener('click', function(e) {
-        if (e.target === this) closeCreatePresetModal();
-      });
-    </script>
-    <button id="createEventBtn" class="btn btn-primary" style="padding: 0.5rem 1rem; margin-left: 0.5rem;">+ Create Event</button>
+    <button id="createPresetBtn" class="btn btn-primary" style="padding: 0.5rem 1rem; margin-left: 0.5rem; background:#ff3b3b; border:1px solid #ff3b3b; color:#fff;">+ Presets</button>
+
+    <!-- Create Preset (simple) is now handled inside Manage Presets modal -->
+
+    <button id="createEventBtn" class="btn btn-primary" style="padding: 0.5rem 1rem; margin-left: 0.5rem; background:#ff3b3b; border:1px solid #ff3b3b; color:#fff;">+ Create Event</button>
     {% endif %}
   </div>
 </div>
 
 <!-- Simplified Calendar Grid -->
-<div class="table-wrapper" style="padding: 1.5rem; min-height: 600px;">
+<div class="table-wrapper" style="padding: 1.5rem; min-height: 600px; background:#000; border-radius:8px; border:1px solid #222;">
   <div style="display: grid; grid-template-columns: 150px 1fr; gap: 1rem;">
     
     <!-- Employee List (Left Sidebar) -->
     <div>
       {% for emp in employees %}
-      <div style="display: flex; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #2d3f4d;">
-        <div style="width: 40px; height: 40px; border-radius: 50%; background: #0dccff; display: flex; align-items: center; justify-content: center; color: #0a1929; font-weight: 600; font-size: 0.85rem; margin-right: 0.75rem;">{{ emp.name[:1] }}</div>
+      <div style="display: flex; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #222;">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background: #ff3b3b; display: flex; align-items: center; justify-content: center; color: #000; font-weight: 600; font-size: 0.85rem; margin-right: 0.75rem;">{{ emp.name[:1] }}</div>
         <div>
-          <div style="font-weight: 500; color: #e0e0e0; font-size: 0.9rem;">{{ emp.name }}</div>
-          <div style="color: #6b7982; font-size: 0.8rem;">{{ emp.level_of_training or 'Staff' }}</div>
+          <div style="font-weight: 500; color: #fff; font-size: 0.9rem;">{{ emp.name }}</div>
+          <div style="color: #888; font-size: 0.8rem;">{{ emp.level_of_training or 'Staff' }}</div>
         </div>
       </div>
       {% endfor %}
@@ -89,132 +51,62 @@
     <!-- Timeline / Events Grid -->
     <div>
       {% for e in events %}
-      <div style="background: #2d3f4d; border-left: 4px solid #0dccff; padding: 1rem; margin-bottom: 1rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#3a4f5f'" onmouseout="this.style.background='#2d3f4d'">
-        <div style="display: flex; justify-content: space-between; align-items: start;">
+      <div style="background: #111; border-left: 4px solid #ff3b3b; padding: 1rem; margin-bottom: 1rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;"
+           onmouseover="this.style.background='#181818'" onmouseout="this.style.background='#111'">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
           <div style="flex: 1;">
-            <div style="font-weight: 600; color: #0dccff; font-size: 0.95rem;">{{ e.title }}</div>
-            <div style="color: #b0bcc4; font-size: 0.85rem; margin-top: 0.5rem;">
+            <div style="font-weight: 600; color: #ff3b3b; font-size: 0.95rem;">{{ e.title }}</div>
+            <div style="color: #ccc; font-size: 0.85rem; margin-top: 0.5rem;">
               📍 {{ e.location }}
             </div>
-            <div style="color: #b0bcc4; font-size: 0.85rem; margin-top: 0.25rem;">
+            <div style="color: #ccc; font-size: 0.85rem; margin-top: 0.25rem;">
               🕒 {{ e.start_time.strftime('%b %d, %H:%M') if e.start_time else 'N/A' }} → {{ e.end_time.strftime('%H:%M') if e.end_time else 'N/A' }}
             </div>
             
             {% if e.employees %}
-            <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #2d3f4d;">
-              <div style="color: #6b7982; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.35rem;">Assigned Staff:</div>
+            <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #222;">
+              <div style="color: #888; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.35rem;">Assigned Staff:</div>
               <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
                 {% for emp in e.employees %}
-                <span style="background: rgba(13, 204, 255, 0.2); color: #0dccff; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.8rem;">{{ emp.name }}</span>
+                <span style="background: rgba(255,59,59,0.15); color: #ff9b9b; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.8rem;">{{ emp.name }}</span>
                 {% endfor %}
               </div>
             </div>
             {% endif %}
 
             {% if e.resources %}
-            <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #2d3f4d;">
-              <div style="color: #6b7982; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.35rem;">Resources:</div>
+            <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #222;">
+              <div style="color: #888; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.35rem;">Resources:</div>
               <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
                 {% for res in e.resources %}
-                <span style="background: rgba(76, 175, 80, 0.2); color: #4caf50; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.8rem;">{{ res.item_code }}</span>
+                <span style="background: rgba(255,255,255,0.08); color: #fff; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.8rem;">{{ res.item_code }}</span>
                 {% endfor %}
               </div>
             </div>
             {% endif %}
           </div>
+
           {% if current_user.is_admin %}
           <div style="display: flex; gap: 0.5rem; margin-left: 1rem;">
-            <a class="btn btn-secondary" style="padding: 0.35rem 0.7rem; font-size: 0.75rem; white-space: nowrap;" href="{{ url_for('edit_event', event_id=e.id) }}">Edit</a>
-            <!-- Edit Event Modal (Admin Only) -->
-            {% if current_user.is_admin %}
-            <div id="editEventModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1050; align-items: center; justify-content: center; display: none;">
-              <div style="background: #232f3a; border: 1px solid #2d3f4d; border-radius: 8px; padding: 2rem; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto;">
-                <h3 style="color: #0dccff; margin-bottom: 1.5rem;">Edit Event</h3>
-                <form id="editEventForm" method="post">
-                  <div style="margin-bottom: 1rem;">
-                    <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Event Title</label>
-                    <input type="text" name="title" id="editEventTitle" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
-                  </div>
-                  <div style="margin-bottom: 1rem;">
-                    <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Location</label>
-                    <input type="text" name="location" id="editEventLocation" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
-                  </div>
-                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
-                    <div>
-                      <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Setup Time (minutes)</label>
-                      <input type="number" name="setup_minutes" id="editEventSetup" min="0" style="width: 100%; padding: 0.45rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
-                    </div>
-                    <div>
-                      <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Packup Time (minutes)</label>
-                      <input type="number" name="packup_minutes" id="editEventPackup" min="0" style="width: 100%; padding: 0.45rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
-                    </div>
-                  </div>
-                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                    <div>
-                      <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Start Time</label>
-                      <input type="datetime-local" name="start_time" id="editEventStart" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
-                    </div>
-                    <div>
-                      <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">End Time</label>
-                      <input type="datetime-local" name="end_time" id="editEventEnd" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
-                    </div>
-                  </div>
-                  <div style="margin-bottom: 1.5rem;">
-                    <label style="display: block; color: #b0bcc4; margin-bottom: 0.75rem; font-weight: 600;">Assign Employees</label>
-                    <div style="background: #1a252f; border: 1px solid #2d3f4d; border-radius: 4px; padding: 1rem; max-height: 200px; overflow-y: auto;">
-                      {% for emp in employees %}
-                      <label style="display: flex; align-items: center; margin-bottom: 0.75rem; cursor: pointer;">
-                        <input type="checkbox" name="employee_ids" value="{{ emp.id }}" class="editEventEmployee">
-                        <span style="color: #e0e0e0;">{{ emp.name }}</span>
-                      </label>
-                      {% endfor %}
-                    </div>
-                  </div>
-                  <div style="margin-bottom: 2rem;">
-                    <label style="display: block; color: #b0bcc4; margin-bottom: 0.75rem; font-weight: 600;">Assign Resources</label>
-                    <div style="background: #1a252f; border: 1px solid #2d3f4d; border-radius: 4px; padding: 1rem; max-height: 200px; overflow-y: auto;">
-                      {% for res in resources %}
-                      <label style="display: flex; align-items: center; margin-bottom: 0.75rem; cursor: pointer;">
-                        <input type="checkbox" name="resource_ids" value="{{ res.id }}" class="editEventResource">
-                        <span style="color: #e0e0e0;">{{ res.item_code }} — {{ res.description or 'N/A' }}</span>
-                      </label>
-                      {% endfor %}
-                    </div>
-                  </div>
-                  <div style="display: flex; gap: 1rem; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid #2d3f4d;">
-                    <button type="button" class="btn btn-secondary" onclick="closeEditEventModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-            <script>
-              function openEditEventModal(eventId) {
-                fetch(`/events`).then(r => r.text()).then(html => {
-                  // Find the event data in the rendered page context (edit_event)
-                  // For a real app, use an API or inject data as JSON
-                  // Here, we use a workaround: reload page with ?edit=eventId or use a hidden div/json
-                  // For now, just open the modal and let user fill manually
-                  document.getElementById('editEventModal').style.display = 'flex';
-                  // Optionally, prefill fields if you have event data available in JS
-                });
-                document.getElementById('editEventForm').action = `/events/${eventId}/edit`;
-              }
-              function closeEditEventModal() {
-                document.getElementById('editEventModal').style.display = 'none';
-              }
-              document.getElementById('editEventModal')?.addEventListener('click', function(e) {
-                if (e.target === this) closeEditEventModal();
-              });
-            </script>
-            {% endif %}
-            <button type="button" class="btn btn-secondary" style="padding: 0.35rem 0.7rem; font-size: 0.75rem; color: #ff6b6b; border-color: #ff6b6b; white-space: nowrap;" onclick="confirmDeleteEvent('{{ e.id }}')">Delete</button>
+            <button type="button"
+                    class="btn btn-secondary"
+                    style="padding: 0.35rem 0.7rem; font-size: 0.75rem; white-space: nowrap; background:#111; border:1px solid #444; color:#fff;"
+                    onclick="openEditEventModal('{{ e.id }}')">
+              Edit
+            </button>
+
+            <button type="button"
+                    class="btn btn-secondary"
+                    style="padding: 0.35rem 0.7rem; font-size: 0.75rem; color: #ff6b6b; border-color: #ff6b6b; background:#111; white-space: nowrap;"
+                    onclick="confirmDeleteEvent('{{ e.id }}')">
+              Delete
+            </button>
           </div>
           {% endif %}
         </div>
       </div>
       {% else %}
-      <div style="text-align: center; padding: 2rem; color: #6b7982;">
+      <div style="text-align: center; padding: 2rem; color: #888;">
         <p>No events scheduled for this period.</p>
       </div>
       {% endfor %}
@@ -223,81 +115,143 @@
   </div>
 </div>
 
-<!-- Create Event Modal (Admin Only) -->
 {% if current_user.is_admin %}
+<!-- Edit Event Modal -->
+<div id="editEventModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1050; align-items: center; justify-content: center; display: none;">
+  <div style="background: #111; border: 1px solid #333; border-radius: 8px; padding: 2rem; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto;">
+    <h3 style="color: #ff3b3b; margin-bottom: 1.5rem;">Edit Event</h3>
+    <form id="editEventForm" method="post">
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: #ccc; margin-bottom: 0.5rem;">Event Title</label>
+        <input type="text" name="title" id="editEventTitle" style="width: 100%; padding: 0.65rem; background: #000; border: 1px solid #333; color: #fff; border-radius: 4px;">
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: #ccc; margin-bottom: 0.5rem;">Location</label>
+        <input type="text" name="location" id="editEventLocation" style="width: 100%; padding: 0.65rem; background: #000; border: 1px solid #333; color: #fff; border-radius: 4px;">
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+        <div>
+          <label style="display: block; color: #ccc; margin-bottom: 0.5rem;">Setup Time (minutes)</label>
+          <input type="number" name="setup_minutes" id="editEventSetup" min="0" style="width: 100%; padding: 0.45rem; background: #000; border: 1px solid #333; color: #fff; border-radius: 4px;">
+        </div>
+        <div>
+          <label style="display: block; color: #ccc; margin-bottom: 0.5rem;">Packup Time (minutes)</label>
+          <input type="number" name="packup_minutes" id="editEventPackup" min="0" style="width: 100%; padding: 0.45rem; background: #000; border: 1px solid #333; color: #fff; border-radius: 4px;">
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <div>
+          <label style="display: block; color: #ccc; margin-bottom: 0.5rem;">Start Time</label>
+          <input type="datetime-local" name="start_time" id="editEventStart" style="width: 100%; padding: 0.65rem; background: #000; border: 1px solid #333; color: #fff; border-radius: 4px;">
+        </div>
+        <div>
+          <label style="display: block; color: #ccc; margin-bottom: 0.5rem;">End Time</label>
+          <input type="datetime-local" name="end_time" id="editEventEnd" style="width: 100%; padding: 0.65rem; background: #000; border: 1px solid #333; color: #fff; border-radius: 4px;">
+        </div>
+      </div>
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; color: #ccc; margin-bottom: 0.75rem; font-weight: 600;">Assign Employees</label>
+        <div style="background: #000; border: 1px solid #333; border-radius: 4px; padding: 1rem; max-height: 200px; overflow-y: auto;">
+          {% for emp in employees %}
+          <label style="display: flex; align-items: center; margin-bottom: 0.75rem; cursor: pointer;">
+            <input type="checkbox" name="employee_ids" value="{{ emp.id }}" class="editEventEmployee" style="margin-right:0.75rem;">
+            <span style="color: #fff;">{{ emp.name }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+      <div style="margin-bottom: 2rem;">
+        <label style="display: block; color: #ccc; margin-bottom: 0.75rem; font-weight: 600;">Assign Resources</label>
+        <div style="background: #000; border: 1px solid #333; border-radius: 4px; padding: 1rem; max-height: 200px; overflow-y: auto;">
+          {% for res in resources %}
+          <label style="display: flex; align-items: center; margin-bottom: 0.75rem; cursor: pointer;">
+            <input type="checkbox" name="resource_ids" value="{{ res.id }}" class="editEventResource" style="margin-right:0.75rem;">
+            <span style="color: #fff;">{{ res.item_code }} — {{ res.description or 'N/A' }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+      <div style="display: flex; gap: 1rem; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid #333;">
+        <button type="button" class="btn btn-secondary" style="background:#111; border:1px solid #444; color:#fff;" onclick="closeEditEventModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary" style="background:#ff3b3b; border:1px solid #ff3b3b; color:#fff;">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- Create Event Modal (Admin Only) -->
 <div id="createEventModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; display: none;">
-  <div style="background: #232f3a; border: 1px solid #2d3f4d; border-radius: 8px; padding: 2rem; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto;">
-    <h3 style="color: #0dccff; margin-bottom: 1.5rem;">Create</h3>
+  <div style="background: #111; border: 1px solid #333; border-radius: 8px; padding: 2rem; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto;">
+    <h3 style="color: #ff3b3b; margin-bottom: 1.5rem;">Create Event</h3>
     <form method="post" action="{{ url_for('new_event') }}">
       <div style="margin-bottom: 1rem;">
-        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Event Title *</label>
-        <input type="text" name="title" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+        <label style="display: block; color: #ccc; margin-bottom: 0.5rem;">Event Title *</label>
+        <input type="text" name="title" style="width: 100%; padding: 0.65rem; background: #000; border: 1px solid #333; color: #fff; border-radius: 4px;">
       </div>
 
       <div style="margin-bottom: 1rem;">
-        <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Location *</label>
-        <input type="text" name="location" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+        <label style="display: block; color: #ccc; margin-bottom: 0.5rem;">Location *</label>
+        <input type="text" name="location" style="width: 100%; padding: 0.65rem; background: #000; border: 1px solid #333; color: #fff; border-radius: 4px;">
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
         <div>
-          <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Setup Time (minutes)</label>
-          <input type="number" name="setup_minutes" min="0" value="0" style="width: 100%; padding: 0.45rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+          <label style="display: block; color: #ccc; margin-bottom: 0.5rem;">Setup Time (minutes)</label>
+          <input type="number" name="setup_minutes" min="0" value="0" style="width: 100%; padding: 0.45rem; background: #000; border: 1px solid #333; color: #fff; border-radius: 4px;">
         </div>
         <div>
-          <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Packup Time (minutes)</label>
-          <input type="number" name="packup_minutes" min="0" value="0" style="width: 100%; padding: 0.45rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+          <label style="display: block; color: #ccc; margin-bottom: 0.5rem;">Packup Time (minutes)</label>
+          <input type="number" name="packup_minutes" min="0" value="0" style="width: 100%; padding: 0.45rem; background: #000; border: 1px solid #333; color: #fff; border-radius: 4px;">
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
         <div>
-          <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">Start Time *</label>
-          <input type="datetime-local" name="start_time" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+          <label style="display: block; color: #ccc; margin-bottom: 0.5rem;">Start Time *</label>
+          <input type="datetime-local" name="start_time" style="width: 100%; padding: 0.65rem; background: #000; border: 1px solid #333; color: #fff; border-radius: 4px;">
         </div>
         <div>
-          <label style="display: block; color: #b0bcc4; margin-bottom: 0.5rem;">End Time *</label>
-          <input type="datetime-local" name="end_time" style="width: 100%; padding: 0.65rem; background: #1a252f; border: 1px solid #2d3f4d; color: #e0e0e0; border-radius: 4px;">
+          <label style="display: block; color: #ccc; margin-bottom: 0.5rem;">End Time *</label>
+          <input type="datetime-local" name="end_time" style="width: 100%; padding: 0.65rem; background: #000; border: 1px solid #333; color: #fff; border-radius: 4px;">
         </div>
       </div>
 
       <div style="margin-bottom: 1.5rem;">
-        <label style="display: block; color: #b0bcc4; margin-bottom: 0.75rem; font-weight: 600;">Assign Employees</label>
-        <div style="background: #1a252f; border: 1px solid #2d3f4d; border-radius: 4px; padding: 1rem; max-height: 200px; overflow-y: auto;">
+        <label style="display: block; color: #ccc; margin-bottom: 0.75rem; font-weight: 600;">Assign Employees</label>
+        <div style="background: #000; border: 1px solid #333; border-radius: 4px; padding: 1rem; max-height: 200px; overflow-y: auto;">
           {% for emp in employees %}
           <label style="display: flex; align-items: center; margin-bottom: 0.75rem; cursor: pointer;">
-            <input type="checkbox" name="employee_ids" value="{{ emp.id }}" style="margin-right: 0.75rem; cursor: pointer;">
-            <span style="color: #e0e0e0;">{{ emp.name }}</span>
+            <input type="checkbox" name="employee_ids" value="{{ emp.id }}" style="margin-right: 0.75rem;">
+            <span style="color: #fff;">{{ emp.name }}</span>
           </label>
           {% endfor %}
         </div>
       </div>
 
-      <!-- NEW resource selector: presets + searchable resource picker -->
+      <!-- Resource selector: presets + searchable resource picker -->
       <div style="margin-bottom: 2rem;">
-        <label style="display: block; color: #b0bcc4; margin-bottom: 0.75rem; font-weight: 600;">Assign Resources</label>
+        <label style="display: block; color: #ccc; margin-bottom: 0.75rem; font-weight: 600;">Assign Resources</label>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
           <div>
-            <label style="color: #b0bcc4; font-size: 0.85rem; margin-bottom: 0.5rem; display:block;">Preset</label>
-            <select name="preset_id" id="presetSelect" style="width:100%; padding:0.5rem; background:#1a252f; border:1px solid #2d3f4d; color:#e0e0e0; border-radius:4px;" onchange="applyPreset(this.value)">
+            <label style="color: #ccc; font-size: 0.85rem; margin-bottom: 0.5rem; display:block;">Preset</label>
+            <select name="preset_id" id="presetSelect" style="width:100%; padding:0.5rem; background:#000; border:1px solid #333; color:#fff; border-radius:4px;" onchange="applyPreset(this.value)">
               <option value="">— None —</option>
               {% for p in presets %}
-                <option value="{{ p.id }}" data-ids='[ {% for r in p.resources %}{{ r.id }}{% if not loop.last %}, {% endif %}{% endfor %} ]'>{{ p.name }}</option>
+                <option value="{{ p.id }}" data-ids="[{% for r in p.resources %}{{ r.id }}{% if not loop.last %}, {% endif %}{% endfor %}]">{{ p.name }}</option>
               {% endfor %}
             </select>
 
-            <div style="color:#6b7982; font-size:0.75rem; margin-top:0.5rem;">Choose a preset to pre-fill resources for this event.</div>
+            <div style="color:#888; font-size:0.75rem; margin-top:0.5rem;">Choose a preset to pre-fill resources for this event.</div>
           </div>
 
           <div>
-            <label style="color: #b0bcc4; font-size: 0.85rem; margin-bottom: 0.5rem; display:block;">Search & add resources</label>
-            <input id="resourceSearch" type="text" placeholder="Search resources by code or description..." oninput="filterResourceList()" style="width:100%; padding:0.5rem; background:#1a252f; border:1px solid #2d3f4d; color:#e0e0e0; border-radius:4px; margin-bottom:0.5rem;">
-            <div id="resourceList" style="background: #1a252f; border: 1px solid #2d3f4d; border-radius:4px; padding:0.75rem; max-height:180px; overflow-y:auto;">
+            <label style="color: #ccc; font-size: 0.85rem; margin-bottom: 0.5rem; display:block;">Search & add resources</label>
+            <input id="resourceSearch" type="text" placeholder="Search resources by code or description..." oninput="filterResourceList()" style="width:100%; padding:0.5rem; background:#000; border:1px solid #333; color:#fff; border-radius:4px; margin-bottom:0.5rem;">
+            <div id="resourceList" style="background: #000; border: 1px solid #333; border-radius:4px; padding:0.75rem; max-height:180px; overflow-y:auto;">
               {% for res in resources %}
-              <div class="resource-row" data-id="{{ res.id }}" data-text="{{ (res.item_code + ' ' + (res.description or '')) | lower }}" style="display:flex; justify-content:space-between; align-items:center; padding:0.35rem 0.25rem; border-bottom:1px solid #26323a;">
-                <div style="color:#e0e0e0; font-size:0.85rem;">{{ res.item_code }} — {{ res.description or 'N/A' }}</div>
-                <button type="button" class="btn btn-secondary" onclick="addResourceFromList('{{ res.id }}','{{ res.item_code }}')">Add</button>
+              <div class="resource-row" data-id="{{ res.id }}" data-text="{{ (res.item_code + ' ' + (res.description or '')) | lower }}" style="display:flex; justify-content:space-between; align-items:center; padding:0.35rem 0.25rem; border-bottom:1px solid #222;">
+                <div style="color:#fff; font-size:0.85rem;">{{ res.item_code }} — {{ res.description or 'N/A' }}</div>
+                <button type="button" class="btn btn-secondary" style="background:#111; border:1px solid #444; color:#fff;" onclick="addResourceFromList('{{ res.id }}','{{ res.item_code }}')">Add</button>
               </div>
               {% endfor %}
             </div>
@@ -305,102 +259,123 @@
         </div>
 
         <div style="margin-top:1rem;">
-          <div style="color: #6b7982; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.35rem;">Selected resources</div>
-          <div id="selectedResources" style="display:flex; flex-wrap:wrap; gap:0.5rem; min-height:36px; padding:0.35rem; background:#0f1a20; border-radius:4px; border:1px solid #24303a;"></div>
+          <div style="color: #888; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.35rem;">Selected resources</div>
+          <div id="selectedResources" style="display:flex; flex-wrap:wrap; gap:0.5rem; min-height:36px; padding:0.35rem; background:#000; border-radius:4px; border:1px solid #222;"></div>
         </div>
       </div>
 
-      <!-- (Nested Create Preset modal removed to avoid nested <form> elements which break submission.) -->
-      <!-- managePresetsModal moved below to avoid nested <form> inside create-event form -->
-
-      <div style="display: flex; gap: 1rem; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid #2d3f4d;">
-        <button type="button" class="btn btn-secondary" onclick="closeCreateEventForm()">Cancel</button>
-        <button type="submit" class="btn btn-primary">Create</button>
+      <div style="display: flex; gap: 1rem; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid #333;">
+        <button type="button" class="btn btn-secondary" style="background:#111; border:1px solid #444; color:#fff;" onclick="closeCreateEventForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary" style="background:#ff3b3b; border:1px solid #ff3b3b; color:#fff;">Create</button>
       </div>
     </form>
   </div>
 </div>
 
-  <div id="managePresetsModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1100; align-items: center; justify-content: center; display: none;">
-    <div style="background: #232f3a; border: 1px solid #2d3f4d; border-radius: 8px; padding: 1.5rem; width: 90%; max-width: 700px; max-height: 90vh; overflow-y: auto;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-        <h3 style="color: #0dccff; margin:0;">Manage Resource Presets</h3>
-        <button class="btn btn-secondary" onclick="closeManagePresets()">Close</button>
+<!-- Manage Presets Modal -->
+<div id="managePresetsModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1100; align-items: center; justify-content: center; display: none;">
+  <div style="background: #111; border: 1px solid #333; border-radius: 8px; padding: 1.5rem; width: 90%; max-width: 700px; max-height: 90vh; overflow-y: auto;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+      <h3 style="color: #ff3b3b; margin:0;">Manage Resource Presets</h3>
+      <button class="btn btn-secondary" style="background:#111; border:1px solid #444; color:#fff;" onclick="closeManagePresets()">Close</button>
+    </div>
+
+    <div style="display:flex; gap:1rem;">
+      <!-- LEFT: Existing presets list (Edit + Delete) -->
+      <div style="flex:1;">
+        <h4 style="color:#ccc; font-size:0.95rem; margin-bottom:0.5rem;">Existing Presets</h4>
+        {% if presets %}
+        <div style="background:#000; border:1px solid #333; border-radius:6px; padding:0.75rem; max-height:360px; overflow-y:auto;">
+          {% for p in presets %}
+          <div
+            class="preset-row"
+            data-id="{{ p.id }}"
+            data-name="{{ p.name }}"
+            data-resource-ids="[{% for r in p.resources %}{{ r.id }}{% if not loop.last %}, {% endif %}{% endfor %}]"
+            style="padding:0.5rem; border-bottom:1px solid #222; display:flex; justify-content:space-between; align-items:center; gap:0.5rem;"
+          >
+            <div>
+              <div style="color:#fff; font-weight:600;">{{ p.name }}</div>
+              <div style="color:#888; font-size:0.8rem; margin-top:0.25rem;">
+                {% for r in p.resources %}
+                  <span style="background: rgba(255,255,255,0.08); color:#fff; padding:0.15rem 0.35rem; border-radius:3px; font-size:0.75rem; margin-right:0.25rem;">
+                    {{ r.item_code }}
+                  </span>
+                {% endfor %}
+              </div>
+            </div>
+            <div style="display:flex; gap:0.5rem;">
+              <button type="button" class="btn btn-secondary" style="background:#111; border:1px solid #444; color:#fff;" onclick="loadPresetForEdit({{ p,id }})">Edit</button>
+              <form method="POST" action="/presets/{{ p.id }}/delete" onsubmit="return confirm('Delete preset &quot;{{ p.name }}&quot;?')">
+                <button type="submit" class="btn" style="color:#ff6b6b; border:1px solid #ff6b6b; background:#111;">Delete</button>
+              </form>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div style="color:#888;">No presets created yet.</div>
+        {% endif %}
       </div>
 
-      <div style="display:flex; gap:1rem;">
-        <div style="flex:1;">
-          <h4 style="color:#b0bcc4; font-size:0.95rem; margin-bottom:0.5rem;">Existing Presets</h4>
-          {% if presets %}
-          <div style="background:#1a252f; border:1px solid #2d3f4d; border-radius:6px; padding:0.75rem; max-height:360px; overflow-y:auto;">
-            {% for p in presets %}
-            <div style="padding:0.5rem; border-bottom:1px solid #26323a; display:flex; justify-content:space-between; align-items:center; gap:0.5rem;">
-              <div>
-                <div style="color:#e0e0e0; font-weight:600;">{{ p.name }}</div>
-                <div style="color:#6b7982; font-size:0.8rem; margin-top:0.25rem;">{% for r in p.resources %} <span style="background: rgba(76, 175, 80, 0.08); color:#9de6a8; padding:0.15rem 0.35rem; border-radius:3px; font-size:0.75rem; margin-right:0.25rem;">{{ r.item_code }}</span>{% endfor %}</div>
-              </div>
-              <div style="display:flex; gap:0.5rem;">
-                <form method="POST" action="/presets/{{ p.id }}/delete" onsubmit="return confirm('Delete preset &quot;{{ p.name }}&quot;?')">
-                  <button type="submit" class="btn" style="color:#ff6b6b; border-color:#ff6b6b;">Delete</button>
-                </form>
-              </div>
-            </div>
+      <!-- RIGHT: Create / Edit preset form -->
+      <div style="width:320px;">
+        <h4 id="presetFormTitle" style="color:#ccc; font-size:0.95rem; margin-bottom:0.5rem;">Create Preset</h4>
+        <form id="presetForm" method="POST" action="/presets/new">
+          <input type="hidden" name="preset_id" id="presetIdField">
+          <div style="margin-bottom:0.5rem;">
+            <input
+              name="name"
+              id="presetNameField"
+              placeholder="Preset name"
+              required
+              style="width:100%; padding:0.5rem; background:#000; border:1px solid #333; color:#fff; border-radius:4px;"
+            >
+          </div>
+          <div style="max-height:260px; overflow-y:auto; background:#000; border-radius:4px; padding:0.5rem; border:1px solid #222;">
+            {% for res in resources %}
+            <label style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.35rem;">
+              <input type="checkbox" name="resource_ids" value="{{ res.id }}" class="presetResourceCheckbox">
+              <span style="color:#fff;">{{ res.item_code }} — {{ res.description or 'N/A' }}</span>
+            </label>
             {% endfor %}
           </div>
-          {% else %}
-          <div style="color:#6b7982;">No presets created yet.</div>
-          {% endif %}
-        </div>
-
-        <div style="width:320px;">
-          <h4 style="color:#b0bcc4; font-size:0.95rem; margin-bottom:0.5rem;">Create Preset</h4>
-          <form method="POST" action="/presets/new" onsubmit="return handlePresetSubmit(event)">
-            <div style="margin-bottom:0.5rem;">
-              <input name="name" placeholder="Preset name" required style="width:100%; padding:0.5rem; background:#1a252f; border:1px solid #2d3f4d; color:#e0e0e0; border-radius:4px;">
-            </div>
-            <div style="max-height:260px; overflow-y:auto; background:#0f1a20; border-radius:4px; padding:0.5rem; border:1px solid #24303a;">
-              {% for res in resources %}
-              <label style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.35rem;">
-                <input type="checkbox" name="resource_ids" value="{{ res.id }}">
-                <span style="color:#e0e0e0;">{{ res.item_code }} — {{ res.description or 'N/A' }}</span>
-              </label>
-              {% endfor %}
-            </div>
-            <div style="display:flex; gap:0.5rem; justify-content:flex-end; margin-top:0.75rem;">
-              <button type="button" class="btn btn-secondary" onclick="closeManagePresets()">Cancel</button>
-              <button type="submit" class="btn btn-primary">Create Preset</button>
-            </div>
-          </form>
-        </div>
+          <div style="display:flex; gap:0.5rem; justify-content:flex-end; margin-top:0.75rem;">
+            <button type="button" class="btn btn-secondary" style="background:#111; border:1px solid #444; color:#fff;" onclick="resetPresetFormToCreate()">Clear</button>
+            <button type="submit" id="presetSubmitBtn" class="btn btn-primary" style="background:#ff3b3b; border:1px solid #ff3b3b; color:#fff;">Create Preset</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
-
+</div>
 <script>
-  // PRESETS: data is stored on each <option> as a data-ids attribute to keep this script valid JS
-  // (the preset -> resource-id mapping is read from the selected option at runtime)
-
-  let selectedResourceIds = new Set();
+  var selectedResourceIds = new Set();
 
   function openCreateEventForm() {
-    document.getElementById('createEventModal').style.display = 'flex';
+    var m = document.getElementById('createEventModal');
+    if (m) m.style.display = 'flex';
   }
 
   function closeCreateEventForm() {
-    // clear temporary UI state when closing
     selectedResourceIds.clear();
-    document.getElementById('selectedResources').innerHTML = '';
-    // remove any hidden inputs named resource_ids inside the create-event form
-    document.querySelectorAll('#createEventModal input[name="resource_ids"][type="hidden"]').forEach(n => n.remove());
-    document.getElementById('presetSelect').value = '';
-    document.getElementById('createEventModal').style.display = 'none';
+    var sel = document.getElementById('selectedResources');
+    if (sel) sel.innerHTML = '';
+    var hiddenNodes = document.querySelectorAll('#createEventModal input[name="resource_ids"][type="hidden"]');
+    for (var i = 0; i < hiddenNodes.length; i++) {
+      hiddenNodes[i].parentNode.removeChild(hiddenNodes[i]);
+    }
+    var presetSelect = document.getElementById('presetSelect');
+    if (presetSelect) presetSelect.value = '';
+    var m = document.getElementById('createEventModal');
+    if (m) m.style.display = 'none';
   }
 
   function confirmDeleteEvent(eventId) {
     if (confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
-      const form = document.createElement('form');
+      var form = document.createElement('form');
       form.method = 'POST';
-      form.action = `/events/${eventId}/delete`;
+      form.action = '/events/' + eventId + '/delete';
       document.body.appendChild(form);
       form.submit();
     }
@@ -411,101 +386,211 @@
   }
 
   function addSelectedResource(id, code) {
-    const numericId = String(id);
-    if (selectedResourceIds.has(numericId)) return; // already added
+    var numericId = String(id);
+    if (selectedResourceIds.has(numericId)) return;
     selectedResourceIds.add(numericId);
 
-    // visual badge
-    const badge = document.createElement('span');
+    var badge = document.createElement('span');
     badge.className = 'selected-resource-badge';
-    badge.dataset.id = numericId;
-    badge.style.background = 'rgba(76, 175, 80, 0.08)';
-    badge.style.color = '#9de6a8';
+    badge.setAttribute('data-id', numericId);
+    badge.style.background = 'rgba(255,255,255,0.08)';
+    badge.style.color = '#fff';
     badge.style.padding = '0.25rem 0.5rem';
     badge.style.borderRadius = '4px';
     badge.style.display = 'inline-flex';
     badge.style.alignItems = 'center';
     badge.style.gap = '0.5rem';
-    badge.innerHTML = `<strong style="font-weight:600; color:#e0e0e0;">${code}</strong> <button type="button" style="background:transparent; border:none; color:#ff6b6b; cursor:pointer;">✕</button>`;
+    badge.innerHTML = "<strong style='font-weight:600; color:#fff;'>" + code + "</strong> <button type='button' style='background:transparent; border:none; color:#ff6b6b; cursor:pointer;'>✕</button>";
 
-    badge.querySelector('button').addEventListener('click', () => removeSelectedResource(numericId));
+    var btn = badge.querySelector('button');
+    btn.addEventListener('click', function () {
+      removeSelectedResource(numericId);
+    });
 
-    document.getElementById('selectedResources').appendChild(badge);
+    var sel = document.getElementById('selectedResources');
+    if (sel) sel.appendChild(badge);
 
-    // hidden input so Flask receives resource_ids (attach to the create-event form)
-    const hidden = document.createElement('input');
+    var hidden = document.createElement('input');
     hidden.type = 'hidden';
     hidden.name = 'resource_ids';
     hidden.value = numericId;
-    hidden.dataset.for = `res-${numericId}`;
-    const createForm = document.querySelector('#createEventModal form');
+    var createForm = document.querySelector('#createEventModal form');
     if (createForm) createForm.appendChild(hidden);
   }
 
   function removeSelectedResource(id) {
     selectedResourceIds.delete(String(id));
-    const badge = document.querySelector(`#selectedResources span[data-id='${id}']`);
-    if (badge) badge.remove();
-    // remove hidden input
-    document.querySelectorAll(`#createEventModal input[name=\"resource_ids\"][value=\"${id}\"]`).forEach(n => n.remove());
+    var badge = document.querySelector("#selectedResources span[data-id='" + id + "']");
+    if (badge && badge.parentNode) badge.parentNode.removeChild(badge);
+    var hiddenNodes = document.querySelectorAll("#createEventModal input[name='resource_ids'][value='" + id + "']");
+    for (var i = 0; i < hiddenNodes.length; i++) {
+      hiddenNodes[i].parentNode.removeChild(hiddenNodes[i]);
+    }
   }
 
   function applyPreset(presetId) {
-    // clear current selections
     selectedResourceIds = new Set();
-    document.getElementById('selectedResources').innerHTML = '';
-    document.querySelectorAll('#createEventModal input[name="resource_ids"][type="hidden"]').forEach(n => n.remove());
+    var sel = document.getElementById('selectedResources');
+    if (sel) sel.innerHTML = '';
+    var hiddenNodes = document.querySelectorAll('#createEventModal input[name="resource_ids"][type="hidden"]');
+    for (var i = 0; i < hiddenNodes.length; i++) {
+      hiddenNodes[i].parentNode.removeChild(hiddenNodes[i]);
+    }
 
     if (!presetId) return;
 
-    const opt = document.querySelector(`#presetSelect option[value='${presetId}']`);
+    var opt = document.querySelector("#presetSelect option[value='" + presetId + "']");
     if (!opt) return;
 
-    // option.dataset.ids is like: "[1, 2, 3]"
-    let idsData = opt.dataset.ids || '[]';
-    let ids = [];
+    var idsData = opt.getAttribute('data-ids') || '[]';
+    var ids = [];
     try {
       ids = JSON.parse(idsData);
     } catch (err) {
-      // fallback to comma-separated parsing
-      ids = idsData.replace(/[^0-9,]/g, '').split(',').filter(Boolean).map(s => s.trim());
+      ids = idsData.replace(/[^0-9,]/g, '').split(',').filter(function (s) { return s; }).map(function (s) { return s.trim(); });
     }
 
-    ids.forEach(rid => {
-      const row = document.querySelector(`.resource-row[data-id='${rid}']`);
-      const code = row ? row.textContent.trim().split('—')[0].trim() : String(rid);
+    for (var i = 0; i < ids.length; i++) {
+      var rid = ids[i];
+      var row = document.querySelector(".resource-row[data-id='" + rid + "']");
+      var code;
+      if (row) {
+        var text = row.textContent || '';
+        code = text.split('—')[0].trim();
+      } else {
+        code = String(rid);
+      }
       addSelectedResource(rid, code);
-    });
+    }
   }
 
   function filterResourceList() {
-    const q = (document.getElementById('resourceSearch').value || '').trim().toLowerCase();
-    document.querySelectorAll('.resource-row').forEach(row => {
-      const text = row.dataset.text || '';
-      row.style.display = q === '' || text.indexOf(q) !== -1 ? 'flex' : 'none';
+    var input = document.getElementById('resourceSearch');
+    var q = '';
+    if (input && input.value) {
+      q = input.value.trim().toLowerCase();
+    }
+    var rows = document.querySelectorAll('.resource-row');
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      var text = row.getAttribute('data-text') || '';
+      if (q === '' || text.indexOf(q) !== -1) {
+        row.style.display = 'flex';
+      } else {
+        row.style.display = 'none';
+      }
+    }
+  }
+
+  function openManagePresets() {
+    var m = document.getElementById('managePresetsModal');
+    if (m) {
+      m.style.display = 'flex';
+      resetPresetFormToCreate();
+    }
+  }
+
+  function closeManagePresets() {
+    var m = document.getElementById('managePresetsModal');
+    if (m) m.style.display = 'none';
+  }
+
+  var managePresetsModal = document.getElementById('managePresetsModal');
+  if (managePresetsModal) {
+    managePresetsModal.addEventListener('click', function (e) {
+      if (e.target === managePresetsModal) {
+        closeManagePresets();
+      }
     });
   }
 
-  // Manage Presets modal
-  function openManagePresets() {
-    document.getElementById('managePresetsModal').style.display = 'flex';
-  }
-  function closeManagePresets() {
-    document.getElementById('managePresetsModal').style.display = 'none';
-  }
-  document.getElementById('managePresetsModal')?.addEventListener('click', function(e) {
-    if (e.target === this) closeManagePresets();
-  });
-
-  // Close create modal when clicking outside
-  document.getElementById('createEventModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-      closeCreateEventForm();
+  function resetPresetFormToCreate() {
+    var form = document.getElementById('presetForm');
+    if (!form) return;
+    form.action = '/presets/new';
+    var title = document.getElementById('presetFormTitle');
+    if (title) title.textContent = 'Create Preset';
+    var btn = document.getElementById('presetSubmitBtn');
+    if (btn) btn.textContent = 'Create Preset';
+    var idField = document.getElementById('presetIdField');
+    if (idField) idField.value = '';
+    var nameField = document.getElementById('presetNameField');
+    if (nameField) nameField.value = '';
+    var cbs = form.querySelectorAll('.presetResourceCheckbox');
+    for (var i = 0; i < cbs.length; i++) {
+      cbs[i].checked = false;
     }
-  });
+  }
 
-  // Attach Create Event button to open the modal
-  document.getElementById('createEventBtn')?.addEventListener('click', openCreateEventForm);
+  function loadPresetForEdit(id) {
+    var row = document.querySelector('.preset-row[data-id="' + id + '"]');
+    if (!row) return;
+
+    var name = row.getAttribute('data-name') || '';
+    var idsData = row.getAttribute('data-resource-ids') || '[]';
+    var ids = [];
+    try {
+      ids = JSON.parse(idsData);
+    } catch (err) {
+      ids = idsData.replace(/[^0-9,]/g, '').split(',').filter(function (s) { return s; }).map(function (s) { return parseInt(s.trim(), 10); });
+    }
+
+    var form = document.getElementById('presetForm');
+    if (!form) return;
+
+    form.action = '/presets/' + id + '/edit';
+    var title = document.getElementById('presetFormTitle');
+    if (title) title.textContent = 'Edit Preset';
+    var btn = document.getElementById('presetSubmitBtn');
+    if (btn) btn.textContent = 'Save Changes';
+    var idField = document.getElementById('presetIdField');
+    if (idField) idField.value = id;
+    var nameField = document.getElementById('presetNameField');
+    if (nameField) nameField.value = name;
+
+    var cbs = form.querySelectorAll('.presetResourceCheckbox');
+    for (var i = 0; i < cbs.length; i++) {
+      var cb = cbs[i];
+      var val = parseInt(cb.value, 10);
+      cb.checked = ids.indexOf(val) !== -1;
+    }
+  }
+
+  function openEditEventModal(eventId) {
+    var m = document.getElementById('editEventModal');
+    if (m) m.style.display = 'flex';
+    var f = document.getElementById('editEventForm');
+    if (f) f.action = '/events/' + eventId + '/edit';
+    // Prefill could be added via data attributes or an API; currently user edits manually.
+  }
+
+  function closeEditEventModal() {
+    var m = document.getElementById('editEventModal');
+    if (m) m.style.display = 'none';
+  }
+
+  var createEventModal = document.getElementById('createEventModal');
+  if (createEventModal) {
+    createEventModal.addEventListener('click', function (e) {
+      if (e.target === createEventModal) {
+        closeCreateEventForm();
+      }
+    });
+  }
+
+  var createEventBtn = document.getElementById('createEventBtn');
+  if (createEventBtn) {
+    createEventBtn.addEventListener('click', function () {
+      openCreateEventForm();
+    });
+  }
+
+  var createPresetBtn = document.getElementById('createPresetBtn');
+  if (createPresetBtn) {
+    createPresetBtn.addEventListener('click', function () {
+      openManagePresets();
+    });
+  }
 </script>
 {% endif %}
 
