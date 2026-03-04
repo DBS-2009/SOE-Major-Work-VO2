@@ -196,7 +196,7 @@
 </div>
 <!-- Create Event Modal (Admin Only) -->
 <div id="createEventModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; display: none;">
-  <div style="background: #111; border: 1px solid #333; border-radius: 8px; padding: 2rem; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto;">
+  <div style="background: #111; border: 1px solid #333; border-radius: 8px; padding: 2rem; width: 95%; max-width: 800px; max-height: 95vh; overflow-y: auto;">
     <h3 style="color: #ff3b3b; margin-bottom: 1.5rem;">Create Event</h3>
     <form method="post" action="{{ url_for('new_event') }}">
       <div style="margin-bottom: 1rem;">
@@ -233,16 +233,22 @@
 
       <div style="margin-bottom: 1.5rem;">
         <label style="display: block; color: #ccc; margin-bottom: 0.75rem; font-weight: 600;">Qualifications Required</label>
-        <select id="createEventQualificationSelect" style="width:100%; padding:0.5rem; background:#000; border:1px solid #333; color:#fff; border-radius:4px; margin-bottom:0.75rem;" onchange="filterCreateEventEmployees()">
-          <option value="">— None —</option>
-          {% for q in qualifications %}
-            <option value="{{ q.name }}">{{ q.name }}</option>
-          {% endfor %}
-        </select>
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+          <select id="createEventQualificationSelect" name="qualification" style="width:100%; padding:0.5rem; background:#000; border:1px solid #333; color:#fff; border-radius:4px;" onchange="filterCreateEventEmployees()">
+            <option value="">— None —</option>
+            {% for q in qualifications %}
+              <option value="{{ q.id }}">{{ q.name }}{% if q.description %} — {{ q.description }}{% endif %}</option>
+            {% endfor %}
+          </select>
+          <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; color: #ccc;">
+            <input type="checkbox" id="filterByQualification" name="filter_by_qualification" checked>
+            Filter employees by qualification
+          </label>
+        </div>
         <label style="display: block; color: #ccc; margin-bottom: 0.75rem; font-weight: 600;">Assign Employees</label>
-        <div id="createEventEmployeeList" style="background: #000; border: 1px solid #333; border-radius: 4px; padding: 1rem; max-height: 200px; overflow-y: auto;">
+        <div id="createEventEmployeeList" style="background: #000; border: 1px solid #333; border-radius: 4px; padding: 1rem; max-height: 250px; overflow-y: auto;">
           {% for emp in employees %}
-          <label class="create-event-employee-row" data-qualifications="{{ emp.qualifications | map(attribute='name') | join(',') }}" style="display: flex; align-items: center; margin-bottom: 0.75rem; cursor: pointer;">
+          <label class="create-event-employee-row" data-qualifications="{% for q in emp.qualifications %}{{ q.qualification_type.id }}{% if not loop.last %},{% endif %}{% endfor %}" style="display: flex; align-items: center; margin-bottom: 0.75rem; cursor: pointer;">
             <input type="checkbox" name="employee_ids" value="{{ emp.id }}" style="margin-right: 0.75rem;">
             <span style="color: #fff;">{{ emp.name }}</span>
           </label>
@@ -250,52 +256,38 @@
         </div>
       </div>
 
-      <!-- Resource selector: presets + searchable resource picker -->
-      <div style="margin-bottom: 1.5rem;">
-        <label style="display: block; color: #ccc; margin-bottom: 0.75rem; font-weight: 600;">Qualifications Required</label>
-        <select id="editEventQualificationSelect" style="width:100%; padding:0.5rem; background:#000; border:1px solid #333; color:#fff; border-radius:4px; margin-bottom:0.75rem;" onchange="filterEditEventEmployees()">
-          <option value="">— None —</option>
-          {% for q in qualifications %}
-            <option value="{{ q.name }}">{{ q.name }}</option>
-          {% endfor %}
-        </select>
-        <label style="display: block; color: #ccc; margin-bottom: 0.75rem; font-weight: 600;">Assign Employees</label>
-        <div id="editEventEmployeeList" style="background: #000; border: 1px solid #333; border-radius: 4px; padding: 1rem; max-height: 200px; overflow-y: auto;">
-          {% for emp in employees %}
-          <label class="edit-event-employee-row" data-qualifications="{{ emp.qualifications | map(attribute='name') | join(',') }}" style="display: flex; align-items: center; margin-bottom: 0.75rem; cursor: pointer;">
-            <input type="checkbox" name="employee_ids" value="{{ emp.id }}" class="editEventEmployee" style="margin-right:0.75rem;" {% if event and emp in event.employees %}checked{% endif %}>
-            <span style="color: #fff;">{{ emp.name }}</span>
-          </label>
-          {% endfor %}
-        </div>
-      </div>
-
+      <div style="margin-bottom: 2rem;">
+        <label style="display: block; color: #ccc; margin-bottom: 0.75rem; font-weight: 600;">Assign Resources</label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label style="color: #ccc; font-size: 0.85rem; margin-bottom: 0.5rem; display:block;">Preset</label>
+            <select id="presetSelect" style="width:100%; padding:0.5rem; background:#000; border:1px solid #333; color:#fff; border-radius:4px;" onchange="applyPreset(this.value)">
+              <option value="">— None —</option>
+              {% for p in presets %}
+                <option value="{{ p.id }}" data-ids="[{% for r in p.resources %}{{ r.id }}{% if not loop.last %}, {% endif %}{% endfor %}]">{{ p.name }}</option>
+              {% endfor %}
+            </select>
             <div style="color:#888; font-size:0.75rem; margin-top:0.5rem;">Choose a preset to pre-fill resources for this event.</div>
           </div>
-
           <div>
             <label style="color: #ccc; font-size: 0.85rem; margin-bottom: 0.5rem; display:block;">Search & add resources</label>
             <input id="resourceSearch" type="text" placeholder="Search resources by code or description..." oninput="filterResourceList()" style="width:100%; padding:0.5rem; background:#000; border:1px solid #333; color:#fff; border-radius:4px; margin-bottom:0.5rem;">
             <div id="resourceList" style="background: #000; border: 1px solid #333; border-radius:4px; padding:0.75rem; max-height:180px; overflow-y:auto;">
               {% for res in resources %}
-              <div class="resource-row" data-id="{{ res.id }}" data-text="{{ (res.item_code + ' ' + (res.description or '')) | lower }}" style="display:flex; justify-content:space-between; align-items:center; padding:0.35rem 0.25rem; border-bottom:1px solid #222;">
-                <div style="color:#fff; font-size:0.85rem;">{{ res.item_code }} — {{ res.description or 'N/A' }}</div>
-                <button type="button" class="btn btn-secondary" style="background:#111; border:1px solid #444; color:#fff;" onclick="addResourceFromList('{{ res.id }}','{{ res.item_code }}')">Add</button>
-              </div>
+              <label class="resource-row" data-id="{{ res.id }}" data-text="{{ (res.item_code + ' ' + (res.description or '')) | lower }}" style="display:flex; align-items:center; margin-bottom:0.75rem; cursor:pointer;">
+                <input type="checkbox" name="resource_ids" value="{{ res.id }}" style="margin-right:0.75rem;">
+                <span style="color: #fff;">{{ res.item_code }} — {{ res.description or 'N/A' }}</span>
+              </label>
               {% endfor %}
             </div>
+            <div id="selectedResources" style="margin-top:0.5rem; display:flex; gap:0.5rem; flex-wrap:wrap;"></div>
           </div>
-        </div>
-
-        <div style="margin-top:1rem;">
-          <div style="color: #888; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.35rem;">Selected resources</div>
-          <div id="selectedResources" style="display:flex; flex-wrap:wrap; gap:0.5rem; min-height:36px; padding:0.35rem; background:#000; border-radius:4px; border:1px solid #222;"></div>
         </div>
       </div>
 
       <div style="display: flex; gap: 1rem; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid #333;">
         <button type="button" class="btn btn-secondary" style="background:#111; border:1px solid #444; color:#fff;" onclick="closeCreateEventForm()">Cancel</button>
-        <button type="submit" class="btn btn-primary" style="background:#ff3b3b; border:1px solid #ff3b3b; color:#fff;">Create</button>
+        <button type="submit" class="btn btn-primary" style="background:#ff3b3b; border:1px solid #ff3b3b; color:#fff;">Create Event</button>
       </div>
     </form>
   </div>
@@ -401,6 +393,50 @@
           }
         }
       }
+
+      function loadPresetForEdit(presetId) {
+        // Set form to edit mode
+        document.getElementById('presetForm').action = '/presets/' + presetId + '/edit';
+        document.getElementById('presetFormTitle').textContent = 'Edit Preset';
+        document.getElementById('presetSubmitBtn').textContent = 'Save Changes';
+        document.getElementById('presetIdField').value = presetId;
+        // Get preset option to extract name and resource ids
+        var opt = document.querySelector("#presetSelect option[value='" + presetId + "']");
+        if (opt) {
+          document.getElementById('presetNameField').value = opt.textContent;
+          var idsData = opt.getAttribute('data-ids') || '[]';
+          var ids = [];
+          try {
+            ids = JSON.parse(idsData);
+          } catch (err) {
+            ids = idsData.replace(/[^0-9,]/g, '').split(',').filter(function (s) { return s; }).map(function (s) { return s.trim(); });
+          }
+          // Uncheck all resource checkboxes first
+          var cbs = document.querySelectorAll('.presetResourceCheckbox');
+          for (var i = 0; i < cbs.length; i++) {
+            cbs[i].checked = false;
+          }
+          // Check only those in the preset
+          for (var i = 0; i < cbs.length; i++) {
+            if (ids.indexOf(cbs[i].value) !== -1) {
+              cbs[i].checked = true;
+            }
+          }
+        }
+      }
+
+      // Ensure preset form always submits all checked resources
+      document.getElementById('presetForm').onsubmit = function() {
+        var cbs = document.querySelectorAll('.presetResourceCheckbox');
+        for (var i = 0; i < cbs.length; i++) {
+          if (!cbs[i].checked) {
+            cbs[i].removeAttribute('name');
+          } else {
+            cbs[i].setAttribute('name', 'resource_ids');
+          }
+        }
+        return true;
+      };
 
       function filterEditEventEmployees() {
         var select = document.getElementById('editEventQualificationSelect');

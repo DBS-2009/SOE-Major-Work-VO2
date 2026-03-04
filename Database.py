@@ -33,6 +33,7 @@ class Resource(db.Model):
     lifespan_years = db.Column(db.Integer)
 
 
+
 class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
@@ -42,6 +43,28 @@ class Employee(db.Model):
     training_status = db.Column(db.String(120))
     # Qualifications relationship (Qualification rows store attained and expiry dates)
     qualifications = db.relationship('Qualification', backref='employee', cascade='all, delete-orphan')
+
+# Global table for all possible qualifications
+class QualificationType(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(140), unique=True, nullable=False)
+    description = db.Column(db.String(255))
+
+    def __repr__(self):
+        return f"<QualificationType {self.name}>"
+
+# Employee's attained qualifications (link to QualificationType)
+class Qualification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'), nullable=False)
+    qualification_type_id = db.Column(db.Integer, db.ForeignKey('qualification_type.id'), nullable=False)
+    attained_date = db.Column(db.Date)
+    expires_date = db.Column(db.Date)
+
+    qualification_type = db.relationship('QualificationType')
+
+    def __repr__(self):
+        return f"<Qualification {self.qualification_type.name} for employee {self.employee_id}>"
 
 
 class Roster(db.Model):
@@ -76,8 +99,8 @@ class Event(db.Model):
     setup_minutes = db.Column(db.Integer, default=0)
     packup_minutes = db.Column(db.Integer, default=0)
 
-    employees = db.relationship("Employee", secondary=event_employee)
-    resources = db.relationship("Resource", secondary=event_resource)
+    employees = db.relationship("Employee", secondary=event_employee, cascade="all, delete", passive_deletes=True)
+    resources = db.relationship("Resource", secondary=event_resource, cascade="all, delete", passive_deletes=True)
 
 
 # --- Resource Presets (many-to-many with Resource) ---
@@ -98,14 +121,3 @@ class ResourcePreset(db.Model):
     def __repr__(self):
         return f"<ResourcePreset {self.name}>"
 
-
-# Qualifications table for employees
-class Qualification(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'), nullable=False)
-    name = db.Column(db.String(140), nullable=False)
-    attained_date = db.Column(db.Date)
-    expires_date = db.Column(db.Date)
-
-    def __repr__(self):
-        return f"<Qualification {self.name} for employee {self.employee_id}>"

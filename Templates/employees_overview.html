@@ -274,7 +274,7 @@ body {
           <div style="display:flex; gap:0.35rem; flex-wrap:wrap;">
             {% for q in emp.qualifications %}
               <div class="qual-tag">
-                {{ q.name }}<br>
+                {{ q.qualification_type.name }}<br>
                 <small>{{ q.attained_date and q.attained_date.strftime('%Y-%m-%d') or '-' }} → {{ q.expires_date and q.expires_date.strftime('%Y-%m-%d') or '-' }}</small>
               </div>
             {% else %}
@@ -362,6 +362,14 @@ body {
     document.getElementById('addEmployeeModal').style.display = 'none';
   }
 
+  function openAddQualificationForm() {
+    document.getElementById('addQualificationModal').style.display = 'flex';
+  }
+
+  function closeAddQualificationForm() {
+    document.getElementById('addQualificationModal').style.display = 'none';
+  }
+
   document.getElementById('searchInput').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') applyFilters();
   });
@@ -372,5 +380,29 @@ body {
     }
   });
 </script>
+
+<!-- Add Qualification Modal -->
+{% if current_user.is_admin %}
+<div id="addQualificationModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1001; align-items: center; justify-content: center; display: none;">
+  <div style="background: #161616; border: 1px solid #262626; border-radius: 10px; padding: 2rem; width: 90%; max-width: 400px; max-height: 90vh; overflow-y: auto;">
+    <h3 style="color: #ff2e2e; margin-bottom: 1.5rem;">Add Qualification</h3>
+    <form method="post" action="{{ url_for('add_qualification') }}">
+      <input type="hidden" name="employee_id" value="{{ emp.id if emp else '' }}">
+      <div style="margin-bottom: 1rem;">
+        <label>Name *</label>
+        <input type="text" name="name" required>
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <label>Description</label>
+        <textarea name="description" rows="2" placeholder="Description..."></textarea>
+      </div>
+      <div style="display: flex; gap: 1rem; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid #333;">
+        <button type="button" class="btn btn-secondary" onclick="closeAddQualificationForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Add Qualification</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}
 
 {% endblock %}

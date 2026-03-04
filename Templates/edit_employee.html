@@ -145,9 +145,15 @@
       <input type="text" name="training_status" value="{{ employee.training_status or 'Not Trained' }}" class="form-input">
     </div>
 
+
     <div class="form-group">
       <label class="form-label">Add Qualification (optional)</label>
-      <input type="text" name="qualifications" placeholder="Qualification name" class="form-input">
+      <select name="qualifications" class="form-input">
+        <option value="">Select a qualification</option>
+        {% for q in qualifications_list %}
+          <option value="{{ q.name }}">{{ q.name }}{% if q.description %} — {{ q.description }}{% endif %}</option>
+        {% endfor %}
+      </select>
     </div>
 
     <div class="btn-row">

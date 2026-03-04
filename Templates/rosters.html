@@ -1,3 +1,56 @@
+<!-- Qualification Management Modal (Admin Only) -->
+{% if current_user.is_admin %}
+<div id="manageQualificationsModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1100; align-items: center; justify-content: center; display: none;">
+  <div style="background: #232f3a; border: 1px solid #2d3f4d; border-radius: 8px; padding: 2rem; width: 90%; max-width: 700px; max-height: 90vh; overflow-y: auto; display: flex; gap: 2rem;">
+    <div style="flex:1; min-width:220px;">
+      <h3 style="color: #ff2e2e; margin-bottom: 1.5rem;">Manage Qualifications</h3>
+      <form method="post" action="{{ url_for('add_qualification') }}">
+        <div style="margin-bottom: 1rem;">
+          <label>Name *</label>
+          <input type="text" name="name" required style="width:100%; padding:0.65rem; background:#0f0f0f; border:1px solid #262626; color:#e6e6e6; border-radius:6px;">
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label>Description</label>
+          <textarea name="description" rows="2" placeholder="Description..." style="width:100%; padding:0.65rem; background:#0f0f0f; border:1px solid #262626; color:#e6e6e6; border-radius:6px;"></textarea>
+        </div>
+        <div style="display: flex; gap: 1rem; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid #333;">
+          <button type="button" class="btn btn-secondary" onclick="closeManageQualificationsModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Qualification</button>
+        </div>
+      </form>
+    </div>
+    <div style="flex:1.2; min-width:260px; max-height:60vh; overflow-y:auto;">
+      <h4 style="color:#fff; margin-bottom:0.5rem;">Existing Qualifications</h4>
+      <ul style="list-style:none; padding:0; color:#e6e6e6;">
+        {% for q in qualifications %}
+        <li style="margin-bottom:0.5rem; display:flex; align-items:center; justify-content:space-between;">
+          <span>{{ q.name }} <span style="color:#888; font-size:0.9em;">{{ q.description }}</span></span>
+          <form method="post" action="{{ url_for('delete_qualification', qualification_id=q.id) }}" style="display:inline; margin-left:1rem;">
+            <button type="submit" class="btn btn-secondary" style="padding:0.2rem 0.7rem; font-size:0.9em;">Delete</button>
+          </form>
+        </li>
+        {% else %}
+        <li style="color:#888;">No qualifications added yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+<!-- Move Manage Qualifications button into top controls -->
+<script>
+function openManageQualificationsModal() {
+  document.getElementById('manageQualificationsModal').style.display = 'flex';
+}
+function closeManageQualificationsModal() {
+  document.getElementById('manageQualificationsModal').style.display = 'none';
+}
+document.getElementById('manageQualificationsModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeManageQualificationsModal();
+  }
+});
+</script>
+{% endif %}
 {% extends "base.html" %}
 {% block content %}
 
@@ -179,6 +232,7 @@ div[style*="text-transform: uppercase"] {
   <div style="display: flex; gap: 1rem;">
     {% if current_user.is_admin %}
     <button class="btn btn-primary" onclick="openAddRosterForm()">+ Add Roster Entry</button>
+    <button class="btn btn-secondary" onclick="openManageQualificationsModal()">Manage Qualifications</button>
     {% endif %}
     <a href="{{ url_for('employees_overview') }}" style="text-decoration: none;">
       <button class="btn btn-secondary">👥 Employee Management</button>

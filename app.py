@@ -1,41 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from Extensions import db
-from Database import User, Resource, Employee, Roster, Event, ResourcePreset
+from flask_migrate import Migrate
+from Database import User, Resource, Employee, Roster, Event, ResourcePreset, QualificationType, Qualification
 from datetime import datetime
 from sqlalchemy.exc import OperationalError
 from functools import wraps
 
-
-
-def admin_required(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        if not current_user.is_admin:
-            abort(403)
-        return f(*args, **kwargs)
-    return wrapper
-
-
-def create_app():
-    app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///rostering.db'
-
-
-    db.init_app(app)
-
-    login_manager = LoginManager()
-    login_manager.login_view = "login"
-    login_manager.init_app(app)
-
-    @login_manager.user_loader
-    def load_user(user_id):
-        return User.query.get(int(user_id))
-
-    with app.app_context():
-        db.create_all()
-        # ...existing code...
-
+    # ---------- Main ----------
 
 def admin_required(f):
     @wraps(f)
@@ -51,7 +23,9 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///rostering.db'
     app.config['SECRET_KEY'] = 'change-me'
 
+
     db.init_app(app)
+    migrate = Migrate(app, db)
 
     login_manager = LoginManager()
     login_manager.login_view = "login"
@@ -79,6 +53,8 @@ def create_app():
         ensure_column('user', 'employee_id', "ALTER TABLE user ADD COLUMN employee_id INTEGER")
         ensure_column('event', 'setup_minutes', "ALTER TABLE event ADD COLUMN setup_minutes INTEGER DEFAULT 0")
         ensure_column('event', 'packup_minutes', "ALTER TABLE event ADD COLUMN packup_minutes INTEGER DEFAULT 0")
+        # Add qualification_type_id to qualification if missing
+        ensure_column('qualification', 'qualification_type_id', "ALTER TABLE qualification ADD COLUMN qualification_type_id INTEGER")
 
         # Create admin user if not exists; if schema is out of sync, raise error (do NOT drop data)
         try:
@@ -90,8 +66,9 @@ def create_app():
         except OperationalError as e:
             # Do NOT drop tables or recreate DB. Instead, raise a clear error.
             raise RuntimeError("Database schema is out of sync with models. Please run a migration or add missing columns manually. No data was deleted.") from e
-
+        
     # ---------------- EDIT EVENT ROUTE ----------------
+
     @app.route('/events/<int:event_id>/edit', methods=['GET', 'POST'])
     @login_required
     @admin_required
@@ -121,16 +98,22 @@ def create_app():
                 pass
             # Employees
             event.employees.clear()
+            emp_ids = set()
             for emp_id in request.form.getlist('employee_ids'):
-                emp = Employee.query.get(int(emp_id))
-                if emp and emp not in event.employees:
-                    event.employees.append(emp)
+                if emp_id not in emp_ids:
+                    emp = Employee.query.get(int(emp_id))
+                    if emp:
+                        event.employees.append(emp)
+                        emp_ids.add(emp_id)
             # Resources
             event.resources.clear()
+            res_ids = set()
             for res_id in request.form.getlist('resource_ids'):
-                r = Resource.query.get(int(res_id))
-                if r and r not in event.resources:
-                    event.resources.append(r)
+                if res_id not in res_ids:
+                    r = Resource.query.get(int(res_id))
+                    if r:
+                        event.resources.append(r)
+                        res_ids.add(res_id)
             db.session.commit()
             return redirect(url_for('events'))
         # GET: render dedicated edit event page
@@ -403,7 +386,9 @@ def create_app():
                 rosters_q = []
                 employees_q = []
         events_q = Event.query.all()
-        return render_template('rosters.html', rosters=rosters_q, employees=employees_q, events=events_q)
+        from Database import QualificationType
+        qualifications = QualificationType.query.all()
+        return render_template('rosters.html', rosters=rosters_q, employees=employees_q, events=events_q, qualifications=qualifications)
 
     @app.route('/employees')
     @login_required
@@ -436,30 +421,37 @@ def create_app():
             try:
                 employee.age = int(request.form.get('age')) if request.form.get('age') else None
             except ValueError:
-                pass
+                employee.age = None
             try:
-                employee.experience_years = int(request.form.get('experience_years') or 0)
+                employee.experience_years = int(request.form.get('experience_years')) if request.form.get('experience_years') else 0
             except ValueError:
-                employee.experience_years = employee.experience_years or 0
-            employee.level_of_training = request.form.get('level_of_training') or employee.level_of_training
-            employee.training_status = request.form.get('training_status') or employee.training_status
-
+                employee.experience_years = 0
+            employee.level_of_training = request.form.get('level_of_training', employee.level_of_training)
+            employee.training_status = request.form.get('training_status', employee.training_status)
             db.session.commit()
 
-            qualifications_text = request.form.get('qualifications')
+            qualifications_text = request.form.get('qualifications', '').strip()
             if qualifications_text:
-                try:
-                    from Database import Qualification
-                    q = Qualification(employee_id=employee.id, name=qualifications_text)
+                from Database import QualificationType, Qualification
+                # Find or create the qualification type
+                qtype = QualificationType.query.filter_by(name=qualifications_text).first()
+                if not qtype:
+                    qtype = QualificationType(name=qualifications_text)
+                    db.session.add(qtype)
+                    db.session.commit()
+                # Prevent duplicate qualifications for employee
+                existing_q = Qualification.query.filter_by(employee_id=employee.id, qualification_type_id=qtype.id).first()
+                if not existing_q:
+                    q = Qualification(employee_id=employee.id, qualification_type_id=qtype.id)
                     db.session.add(q)
                     db.session.commit()
-                except Exception:
-                    db.session.rollback()
 
             flash(f"Employee '{employee.name}' updated.")
             return redirect(url_for('employee_detail', employee_id=employee.id))
 
-        return render_template('edit_employee.html', employee=employee)
+        from Database import QualificationType
+        qualifications_list = QualificationType.query.all()
+        return render_template('edit_employee.html', employee=employee, qualifications_list=qualifications_list)
 
     @app.route('/employees/new', methods=['POST'])
     @login_required
@@ -533,16 +525,51 @@ def create_app():
         db.session.commit()
         return redirect(url_for('rosters'))
 
+
+    @app.route('/add_qualification', methods=['POST'])
+    @login_required
+    @admin_required
+    def add_qualification():
+        name = request.form.get('name', '').strip()
+        description = request.form.get('description', '').strip()
+        if not name:
+            flash('Qualification name is required.', 'danger')
+            return redirect(request.referrer or url_for('rosters'))
+        # Check if qualification already exists
+        existing = QualificationType.query.filter_by(name=name).first()
+        if existing:
+            flash('Qualification already exists.', 'warning')
+            return redirect(request.referrer or url_for('rosters'))
+        qtype = QualificationType(name=name, description=description)
+        db.session.add(qtype)
+        db.session.commit()
+        flash('Qualification added successfully!', 'success')
+        return redirect(request.referrer or url_for('rosters'))
+    
+    @app.route('/delete_qualification/<int:qualification_id>', methods=['POST'])
+    @login_required
+    @admin_required
+    def delete_qualification(qualification_id):
+        from Database import QualificationType
+        q = QualificationType.query.get_or_404(qualification_id)
+        db.session.delete(q)
+        db.session.commit()
+        flash('Qualification deleted.', 'success')
+        return redirect(request.referrer or url_for('rosters'))
+
     # ---------------- EVENTS ----------------
+
 
     @app.route('/events')
     @login_required
     def events():
+        qualifications = QualificationType.query.all()
         return render_template('events.html',
                                events=Event.query.all(),
                                employees=Employee.query.all(),
                                resources=Resource.query.all(),
-                               presets=ResourcePreset.query.all())
+                               presets=ResourcePreset.query.all(),
+                               qualifications=qualifications)
 
     @app.route('/events/new', methods=['POST'])
     @login_required
@@ -680,10 +707,13 @@ def create_app():
             flash('A preset with that name already exists.')
             return redirect(url_for('events'))
         p = ResourcePreset(name=name, description=(request.form.get('description') or '').strip())
+        res_ids = set()
         for res_id in request.form.getlist('resource_ids'):
-            r = Resource.query.get(int(res_id))
-            if r:
-                p.resources.append(r)
+            if res_id not in res_ids:
+                r = Resource.query.get(int(res_id))
+                if r:
+                    p.resources.append(r)
+                    res_ids.add(res_id)
         db.session.add(p)
         db.session.commit()
         flash(f"Preset '{p.name}' created.")
@@ -708,10 +738,13 @@ def create_app():
         p.description = description
         # Update resources
         p.resources.clear()
+        res_ids = set()
         for res_id in request.form.getlist('resource_ids'):
-            r = Resource.query.get(int(res_id))
-            if r:
-                p.resources.append(r)
+            if res_id not in res_ids:
+                r = Resource.query.get(int(res_id))
+                if r:
+                    p.resources.append(r)
+                    res_ids.add(res_id)
         db.session.commit()
         flash(f"Preset '{p.name}' updated.")
         return redirect(url_for('events'))
@@ -769,6 +802,9 @@ def create_app():
 
     return app
 
+
+app = create_app()
+Migrate(app, db)
 
 if __name__ == "__main__":
     app = create_app()

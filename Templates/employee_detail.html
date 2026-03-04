@@ -225,7 +225,12 @@ body {
             <div style="margin-top: 0.5rem;">
               {% if employee.qualifications %}
                 {% for q in employee.qualifications %}
-                  <div class="qual-tag">{{ q.name }}</div>
+                  <div class="qual-tag">
+                    {{ q.qualification_type.name }}<br>
+                    <small>
+                      {{ q.attained_date and q.attained_date.strftime('%Y-%m-%d') or '-' }} → {{ q.expires_date and q.expires_date.strftime('%Y-%m-%d') or '-' }}
+                    </small>
+                  </div>
                 {% endfor %}
               {% else %}
                 <span style="color:#666; font-size:0.85rem;">—</span>
