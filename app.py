@@ -665,6 +665,7 @@ def create_app():
         db.session.commit()
         return redirect(url_for('events'))
 
+
     # ---------------- PRESETS ----------------
 
     @app.route('/presets/new', methods=['POST'])
@@ -686,6 +687,33 @@ def create_app():
         db.session.add(p)
         db.session.commit()
         flash(f"Preset '{p.name}' created.")
+        return redirect(url_for('events'))
+
+    @app.route('/presets/<int:preset_id>/edit', methods=['POST'])
+    @login_required
+    @admin_required
+    def edit_preset(preset_id):
+        p = ResourcePreset.query.get_or_404(preset_id)
+        name = (request.form.get('name') or '').strip()
+        description = (request.form.get('description') or '').strip()
+        if not name:
+            flash('Preset name is required.')
+            return redirect(url_for('events'))
+        # Ensure name is unique (excluding current preset)
+        existing = ResourcePreset.query.filter(ResourcePreset.name == name, ResourcePreset.id != p.id).first()
+        if existing:
+            flash('A preset with that name already exists.')
+            return redirect(url_for('events'))
+        p.name = name
+        p.description = description
+        # Update resources
+        p.resources.clear()
+        for res_id in request.form.getlist('resource_ids'):
+            r = Resource.query.get(int(res_id))
+            if r:
+                p.resources.append(r)
+        db.session.commit()
+        flash(f"Preset '{p.name}' updated.")
         return redirect(url_for('events'))
 
     @app.route('/presets/<int:preset_id>/delete', methods=['POST'])
