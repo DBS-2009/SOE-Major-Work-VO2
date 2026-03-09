@@ -21,7 +21,7 @@ def admin_required(f):
 def create_app():
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///rostering.db'
-    app.config['SECRET_KEY'] = 'change-me'
+
 
 
     db.init_app(app)
