@@ -7,7 +7,7 @@ from datetime import datetime
 from sqlalchemy.exc import OperationalError
 from functools import wraps
 
-    # ---------- Main ----------
+    # ---------- Main ---------- 
 
 def admin_required(f):
     @wraps(f)
@@ -21,7 +21,6 @@ def admin_required(f):
 def create_app():
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///rostering.db'
-
 
 
     db.init_app(app)
