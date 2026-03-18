@@ -1,11 +1,13 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, abort
+from flask import Flask, render_template, request, redirect, url_for, flash, abort, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from Extensions import db
 from flask_migrate import Migrate
 from Database import User, Resource, Employee, Roster, Event, ResourcePreset, QualificationType, Qualification
-from datetime import datetime
+from datetime import datetime, time
 from sqlalchemy.exc import OperationalError
 from functools import wraps
+import serial
+import threading
 
     # ---------- Main ---------- 
 
@@ -66,6 +68,46 @@ def create_app():
             # Do NOT drop tables or recreate DB. Instead, raise a clear error.
             raise RuntimeError("Database schema is out of sync with models. Please run a migration or add missing columns manually. No data was deleted.") from e
         
+    # ---------------- RFID SCANNING ----------------
+
+    # Configure the serial port (adjust port and baudrate)
+    # E.g., 'COM3' for Windows or '/dev/ttyUSB0' for Linux
+    SERIAL_PORT = '/dev/ttyUSB0'
+    BAUD_RATE = 9600
+
+    try:
+        ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+        # Give the connection a moment to settle
+        time.sleep(2)
+        print(f"Connected to {SERIAL_PORT}")
+    except Exception as e:
+        print(f"Error opening serial port: {e}")
+        ser = None
+
+    latest_rfid = "No tag scanned"
+
+    # Function to continuously read from the RFID reader
+    def read_rfid():
+        global latest_rfid
+        while True:
+            if ser and ser.in_waiting > 0:
+                # Read line and decode from bytes
+                data = ser.readline().decode('utf-8').strip()
+                if data:
+                    print(f"RFID Tag: {data}")
+                    latest_rfid = data
+            time.sleep(0.1) # Small delay to avoid 100% CPU usage
+
+    # Start the RFID reading in a separate background thread
+    if ser:
+        rfid_thread = threading.Thread(target=read_rfid)
+        rfid_thread.daemon = True
+        rfid_thread.start()
+
+    @app.route('/get_rfid')
+    def get_rfid():
+        return jsonify({"last_tag": latest_rfid})
+
     # ---------------- EDIT EVENT ROUTE ----------------
 
     @app.route('/events/<int:event_id>/edit', methods=['GET', 'POST'])
