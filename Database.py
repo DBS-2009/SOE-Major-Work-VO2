@@ -31,6 +31,7 @@ class Resource(db.Model):
     asset_number = db.Column(db.String(120))
     dom = db.Column(db.Date)  # Date of Manufacture
     lifespan_years = db.Column(db.Integer)
+    rfid = db.Column(db.String(255), unique=True, nullable=False)
 
 
 
@@ -110,6 +111,7 @@ preset_resource = db.Table(
     db.Column('resource_id', db.Integer, db.ForeignKey('resource.id'))
 )
 
+
 class ResourcePreset(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(140), unique=True, nullable=False)
@@ -120,4 +122,6 @@ class ResourcePreset(db.Model):
 
     def __repr__(self):
         return f"<ResourcePreset {self.name}>"
+
+
 

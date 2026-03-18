@@ -84,26 +84,66 @@ def create_app():
         print(f"Error opening serial port: {e}")
         ser = None
 
-    latest_rfid = "No tag scanned"
+    last_saved_tag = None
 
-    # Function to continuously read from the RFID reader
     def read_rfid():
-        global latest_rfid
+        global latest_rfid, last_saved_tag
         while True:
             if ser and ser.in_waiting > 0:
-                # Read line and decode from bytes
                 data = ser.readline().decode('utf-8').strip()
                 if data:
-                    print(f"RFID Tag: {data}")
                     latest_rfid = data
-            time.sleep(0.1) # Small delay to avoid 100% CPU usage
+                    print(f"RFID Tag: {data}")
 
+                    # Save to DB only if it's new
+                    if data != last_saved_tag:
+                        save_rfid_to_db(data)
+                        last_saved_tag = data
+            time.sleep(0.1)
+
+    def save_rfid_to_db(tag):
+        existing = Resource.query.filter_by(rfid=tag).first()
+        if not existing:
+            new_item = Resource(rfid=tag)
+            db.session.add(new_item)
+            db.session.commit()
+            print(f"Saved new RFID resource: {tag}")
+    
     # Start the RFID reading in a separate background thread
     if ser:
         rfid_thread = threading.Thread(target=read_rfid)
         rfid_thread.daemon = True
         rfid_thread.start()
 
+    @app.route('/get_rfid')
+    def get_rfid():
+        return jsonify({"last_tag": latest_rfid})
+    
+
+    # ---------------- ADMIN RFID ROUTES ----------------
+
+    @app.route('/resources')
+    def list_resources():
+        items = Resource.query.all()
+        return jsonify([{"id": r.id, "rfid": r.rfid, "name": r.name} for r in items])
+
+    @app.route('/events', methods=['POST'])
+    def create_event():
+        data = request.json
+        event = Event(name=data['name'])
+        db.session.add(event)
+        db.session.commit()
+        return jsonify({"message": "Event created", "id": event.id})
+
+    @app.route('/events/<int:event_id>/assign', methods=['POST'])
+    def assign_resources(event_id):
+        data = request.json
+        for resource_id in data['resource_ids']:
+            link = Roster(event_id=event_id, resource_id=resource_id)
+            db.session.add(link)
+        db.session.commit()
+        return jsonify({"message": "Resources assigned"})
+    
     @app.route('/get_rfid')
     def get_rfid():
         return jsonify({"last_tag": latest_rfid})
