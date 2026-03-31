@@ -2,12 +2,13 @@ from flask import Flask, render_template, request, redirect, url_for, flash, abo
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from Extensions import db
 from flask_migrate import Migrate
-from Database import User, Resource, Employee, Roster, Event, ResourcePreset, QualificationType, Qualification
+from Database import User, Resource, Employee, Roster, Event, ResourcePreset, QualificationType, Qualification, init_db
 from datetime import datetime, time
 from sqlalchemy.exc import OperationalError
 from functools import wraps
 import serial
 import threading
+from waitress import serve
 
     # ---------- Main ---------- 
 
@@ -21,8 +22,16 @@ def admin_required(f):
 
 
 def create_app():
+    import os
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///rostering.db'
+    db_url = os.getenv('DATABASE_URL')
+    if db_url:
+        # Render provides DATABASE_URL as 'postgres://', but SQLAlchemy needs 'postgresql://'
+        db_url = db_url.replace('postgres://', 'postgresql://', 1)
+        app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+    else:
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///rostering.db'
+    init_db(app)
 
 
     db.init_app(app)
@@ -889,4 +898,4 @@ Migrate(app, db)
 
 if __name__ == "__main__":
     app = create_app()
-    app.run(debug=True)
+    serve(app, host="0.0.0.0", port=8000)

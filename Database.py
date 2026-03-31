@@ -2,6 +2,31 @@ from Extensions import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import date, datetime
+import os
+BASEDIR = os.path.abspath(os.path.dirname(__file__))
+
+class Config(object):
+    ...
+    # Since SQLAlchemy 1.4.x has removed support for the 'postgres://' URI scheme,
+    # update the URI to the postgres database to use the supported 'postgresql://' scheme
+    if os.getenv('DATABASE_URL'):
+        SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL').replace("postgres://", "postgresql://", 1)
+    else:
+        SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.join(BASEDIR, 'instance', 'app.db')}"
+
+def init_db(app):
+    db_url = os.environ.get("DATABASE_URL")
+    if db_url and db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+    app.config["SQLALCHEMY_DATABASE_URI"] = db_url
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+    db.init_app(app)
+
+    # Auto-create tables on Render
+    with app.app_context():
+        db.create_all()
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -31,7 +56,6 @@ class Resource(db.Model):
     asset_number = db.Column(db.String(120))
     dom = db.Column(db.Date)  # Date of Manufacture
     lifespan_years = db.Column(db.Integer)
-    rfid = db.Column(db.String(255), unique=True, nullable=False)
 
 
 
