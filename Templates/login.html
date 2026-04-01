@@ -258,8 +258,8 @@
   <div class="auth-right">
     <div class="auth-form-wrapper">
       <div class="auth-form-header">
-        <h2>Sign in</h2>
-        <p>Welcome back to the system</p>
+        <h2>Login</h2>
+        <p>Welcome back! Please log in.</p>
       </div>
 
       {% with messages = get_flashed_messages() %}
@@ -271,19 +271,17 @@
       <form method="post">
         <div class="form-group">
           <label for="username">Username</label>
-          <input type="text" id="username" name="username" placeholder="Enter your username" required>
+          <input type="text" id="username" name="username" placeholder="Enter your username" required autofocus>
         </div>
-
         <div class="form-group">
           <label for="password">Password</label>
           <input type="password" id="password" name="password" placeholder="Enter your password" required>
         </div>
-
-        <button type="submit" class="btn-login">Sign In</button>
+        <button type="submit" class="btn-login">Login</button>
       </form>
 
       <div class="auth-footer">
-        <p>Not a member?</p>
+        <p>Don't have an account?</p>
         <a href="{{ url_for('signup') }}" style="text-decoration: none;">
           <button class="btn-secondary-auth">Create Account</button>
         </a>
