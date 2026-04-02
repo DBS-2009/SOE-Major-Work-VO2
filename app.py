@@ -22,7 +22,12 @@ def admin_required(f):
 
 def create_app():
     import os
-    app = Flask(__name__)
+    import pathlib
+    # Explicitly set template and static folder paths to match actual folder names (case-sensitive)
+    base_dir = pathlib.Path(__file__).parent.resolve()
+    template_dir = base_dir / 'Templates'
+    static_dir = base_dir / 'Static'
+    app = Flask(__name__, template_folder=str(template_dir), static_folder=str(static_dir))
     db_url = os.getenv('DATABASE_URL')
     if db_url:
         # Render provides DATABASE_URL as 'postgres://', but SQLAlchemy needs 'postgresql://'
