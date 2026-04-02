@@ -143,7 +143,7 @@ def create_app():
         data = request.json
         event = Event(name=data['name'])
         db.session.add(event)
-        db.session.commit()
+        db.session.commit() 
         return jsonify({"message": "Event created", "id": event.id})
 
     @app.route('/events/<int:event_id>/assign', methods=['POST'])
