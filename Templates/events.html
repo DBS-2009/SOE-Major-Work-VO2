@@ -150,10 +150,23 @@
         </div>
       </div>
       <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; color: #ccc; margin-bottom: 0.75rem; font-weight: 600;">Qualifications Required</label>
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+          <select id="editEventQualificationSelect" name="qualification" style="width:100%; padding:0.5rem; background:#000; border:1px solid #333; color:#fff; border-radius:4px;" onchange="filterEditEventEmployees()">
+            <option value="">— None —</option>
+            {% for q in qualifications %}
+              <option value="{{ q.id }}">{{ q.name }}{% if q.description %} — {{ q.description }}{% endif %}</option>
+            {% endfor %}
+          </select>
+          <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; color: #ccc;">
+            <input type="checkbox" id="editFilterByQualification" name="filter_by_qualification" checked>
+            Filter employees by qualification
+          </label>
+        </div>
         <label style="display: block; color: #ccc; margin-bottom: 0.75rem; font-weight: 600;">Assign Employees</label>
-        <div style="background: #000; border: 1px solid #333; border-radius: 4px; padding: 1rem; max-height: 200px; overflow-y: auto;">
+        <div id="editEventEmployeeList" style="background: #000; border: 1px solid #333; border-radius: 4px; padding: 1rem; max-height: 250px; overflow-y: auto;">
           {% for emp in employees %}
-          <label style="display: flex; align-items: center; margin-bottom: 0.75rem; cursor: pointer;">
+          <label class="edit-event-employee-row" data-qualifications="{% for q in emp.qualifications %}{{ q.qualification_type.id }}{% if not loop.last %},{% endif %}{% endfor %}" style="display: flex; align-items: center; margin-bottom: 0.75rem; cursor: pointer;">
             <input type="checkbox" name="employee_ids" value="{{ emp.id }}" class="editEventEmployee" style="margin-right:0.75rem;" {% if event and emp in event.employees %}checked{% endif %}>
             <span style="color: #fff;">{{ emp.name }}</span>
           </label>

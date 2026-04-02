@@ -8,7 +8,6 @@ from sqlalchemy.exc import OperationalError
 from functools import wraps
 import serial
 import threading
-from waitress import serve
 
     # ---------- Main ---------- 
 
@@ -266,7 +265,7 @@ def create_app():
 
     # ---------------- LOGIN ----------------
 
-    @app.route('/login', methods=['GET', 'POST'])
+    @app.route('/Login', methods=['GET', 'POST'])
     def login():
         if request.method == 'POST':
             user = User.query.filter_by(username=request.form['username']).first()
@@ -898,4 +897,4 @@ Migrate(app, db)
 
 if __name__ == "__main__":
     app = create_app()
-    serve(app, host="0.0.0.0", port=8000)
+    app.run(debug=True)
