@@ -44,20 +44,18 @@ def create_app():
     def load_user(user_id):
         return User.query.get(int(user_id))
 
+    def ensure_column(table, column, add_sql):
+        try:
+            res = db.session.execute(f"PRAGMA table_info('{table}')").fetchall()
+            existing = [r[1] for r in res]
+            if column not in existing:
+                db.session.execute(add_sql)
+                db.session.commit()
+        except Exception:
+            db.session.rollback()
+
     with app.app_context():
         db.create_all()
-        # Ensure certain columns exist in SQLite DB (helpful when evolving schema without migrations)
-        def ensure_column(table, column, add_sql):
-            try:
-                res = db.session.execute(f"PRAGMA table_info('{table}')").fetchall()
-                existing = [r[1] for r in res]
-                if column not in existing:
-                    db.session.execute(add_sql)
-             
-                    db.session.commit()
-            except Exception:
-                db.session.rollback()
-
         # Add user.employee_id, event.setup_minutes, event.packup_minutes if missing
         ensure_column('user', 'employee_id', "ALTER TABLE user ADD COLUMN employee_id INTEGER")
         ensure_column('event', 'setup_minutes', "ALTER TABLE event ADD COLUMN setup_minutes INTEGER DEFAULT 0")
